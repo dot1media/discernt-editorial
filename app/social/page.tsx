@@ -101,6 +101,16 @@ export default function SocialPage() {
     try { await api(`/api/social/${id}`, { method: "DELETE" }); setPosts((ps) => ps.filter((p) => p.id !== id)); } finally { setBusy(""); }
   }
 
+  async function purgeFacebook() {
+    if (!confirm("Delete ALL Facebook posts Discernt published?\n\nThis removes them from the Facebook Page. Instagram posts cannot be deleted through the API — remove those by hand in the Instagram app.\n\nThis cannot be undone.")) return;
+    setBusy("purge"); setErr(""); setNote("");
+    try {
+      const r = await api<{ deleted: number; failed: number; instagramRemaining: number }>(`/api/social/purge`, { method: "POST" });
+      setNote(`Deleted ${r.deleted} Facebook post${r.deleted === 1 ? "" : "s"}${r.failed ? `, ${r.failed} failed` : ""}.${r.instagramRemaining ? ` ${r.instagramRemaining} Instagram post${r.instagramRemaining === 1 ? "" : "s"} must be removed by hand in the Instagram app.` : ""}`);
+      await load();
+    } catch (e: any) { setErr(e?.message || "Facebook purge failed."); } finally { setBusy(""); }
+  }
+
   function toggleTarget(p: Post, t: string) {
     const cur = targetsOf(p);
     const next = cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t];
@@ -127,6 +137,11 @@ export default function SocialPage() {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button className="btn ghost sm" onClick={load}>Refresh</button>
+          {metaOk && (
+            <button className="btn ghost sm" style={{ color: "#E0544B" }} onClick={purgeFacebook} disabled={busy === "purge"}>
+              {busy === "purge" ? "Deleting…" : "Delete all Facebook posts"}
+            </button>
+          )}
           <button className="btn primary sm" onClick={generate} disabled={busy === "generate"}>
             {busy === "generate" ? "Generating…" : "Generate from latest"}
           </button>

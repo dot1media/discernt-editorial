@@ -52,6 +52,35 @@ async function graphPost(path: string, params: Record<string, string>, token: st
   return json;
 }
 
+async function graphDelete(path: string, token: string): Promise<any> {
+  const url = `${GRAPH}/${path}${path.includes("?") ? "&" : "?"}access_token=${encodeURIComponent(token)}`;
+  const res = await fetch(url, { method: "DELETE" });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json.error) {
+    throw new Error(`Graph DELETE ${path.split("?")[0]}: ${json?.error?.message || res.status}`);
+  }
+  return json;
+}
+
+/**
+ * Delete a published Facebook Page post by its id. The Page token carries
+ * pages_manage_posts, so posts the Page published can be removed. Returns true
+ * on success; throws on a Graph error.
+ */
+export async function deleteFromFacebook(postId: string): Promise<boolean> {
+  if (!postId) return false;
+  const tok = await pageAccessToken();
+  const r = await graphDelete(postId, tok);
+  return r?.success !== false;
+}
+
+/**
+ * Instagram published posts CANNOT be deleted through the Meta Graph API — Meta
+ * exposes no delete endpoint for IG media. They must be removed by hand in the
+ * Instagram app. This flag lets callers signal that honestly.
+ */
+export const INSTAGRAM_DELETE_SUPPORTED = false;
+
 let cachedPageToken: { value: string; at: number } | null = null;
 
 /** The Page access token, derived from the system user token. Cached briefly. */

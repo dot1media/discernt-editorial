@@ -4,6 +4,7 @@ import { ensureSchema, audit } from "@/lib/schema";
 import { requireCapability } from "@/lib/session";
 import { readJson } from "@/lib/api";
 import { CATEGORIES } from "@/lib/newsroom";
+import { deleteFromFacebook, metaConfigured } from "@/lib/social/meta";
 
 export const runtime = "nodejs";
 
@@ -61,7 +62,20 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   const { account } = gate;
   await ensureSchema();
   const { id } = await params;
+
+  // If this post went live, take the Facebook post down too. Instagram has no
+  // delete endpoint in Meta's API, so an IG post can only be removed by hand.
+  const rows = (await sql`SELECT fb_post_id, ig_post_id FROM social_posts WHERE id = ${id} LIMIT 1`) as any[];
+  const rec = rows[0] || {};
+  let fbDeleted = false;
+  let fbError = "";
+  if (rec.fb_post_id && metaConfigured()) {
+    try { await deleteFromFacebook(String(rec.fb_post_id)); fbDeleted = true; }
+    catch (e: any) { fbError = e?.message || "Facebook delete failed"; }
+  }
+  const igNote = rec.ig_post_id ? "Instagram posts can't be deleted through Meta's API — remove it in the Instagram app." : "";
+
   await sql`DELETE FROM social_posts WHERE id = ${id}`;
-  await audit(account.email, "social.delete", "social", id, {});
-  return NextResponse.json({ ok: true });
+  await audit(account.email, "social.delete", "social", id, { fbDeleted, fbError, hadIg: !!rec.ig_post_id });
+  return NextResponse.json({ ok: true, fbDeleted, fbError, igNote });
 }

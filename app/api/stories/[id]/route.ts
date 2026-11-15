@@ -4,6 +4,7 @@ import { ensureSchema, audit } from "@/lib/schema";
 import { requireCapability } from "@/lib/session";
 import { readJson, slugify } from "@/lib/api";
 import { snapshotIfChanging } from "@/lib/revisions";
+import { deleteArticle } from "@/lib/newsArchive";
 
 export const runtime = "nodejs";
 
@@ -76,13 +77,32 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   return NextResponse.json({ ok: true });
 }
 
+// Delete a story everywhere. If the story was published, its live copy in
+// news_stories (what the app and news site read) is removed too, so deleting
+// here takes it down from the app and the website, not just the newsroom.
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const gate = await requireCapability("story.delete");
   if ("response" in gate) return gate.response;
   const { account } = gate;
   await ensureSchema();
   const { id } = await params;
+
+  // Find the published copy before we unlink it.
+  let newsStoryId: string | null = null;
+  try {
+    const rows = await sql`SELECT news_story_id FROM stories WHERE id = ${id} LIMIT 1`;
+    newsStoryId = (rows[0]?.news_story_id as string) || null;
+  } catch { /* column may be absent on very old rows */ }
+
+  // Take the live article down from news_stories (app + website). Best-effort so
+  // a news-DB hiccup never blocks removing the editorial record.
+  let liveRemoved = false;
+  if (newsStoryId) {
+    try { await deleteArticle(newsStoryId); liveRemoved = true; }
+    catch (e) { console.error("published delete during story delete failed:", e); }
+  }
+
   await sql`DELETE FROM stories WHERE id = ${id}`;
-  await audit(account.email, "story.delete", "story", id);
-  return NextResponse.json({ ok: true });
+  await audit(account.email, "story.delete", "story", id, { newsStoryId, liveRemoved });
+  return NextResponse.json({ ok: true, liveRemoved });
 }

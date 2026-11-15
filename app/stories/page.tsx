@@ -7,7 +7,7 @@ import { STORY_TEMPLATES } from "@/lib/templates";
 import { api, useMe } from "@/lib/client";
 import { STORY_LIFECYCLE, CLASSIFICATIONS, CATEGORIES, PRIORITIES } from "@/lib/newsroom";
 import { DeadlineBadge, ReviewBadge, PriorityPill, StatusChip, ClassChip } from "@/components/ui";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 function StoriesInner() {
   const params = useSearchParams();
@@ -23,6 +23,14 @@ function StoriesInner() {
     if (status === "archived" && !window.confirm(`Archive ${sel.size} stor${sel.size === 1 ? "y" : "ies"}?`)) return;
     setBulkBusy(true);
     try { for (const id of Array.from(sel)) { try { await api(`/api/stories/${id}/status`, { method: "POST", body: JSON.stringify({ status }) }); } catch {} } setSel(new Set()); await load(); } finally { setBulkBusy(false); }
+  }
+  async function del(id: string, label: string, published: boolean) {
+    const msg = published
+      ? `Delete this story?\n\n"${label}"\n\nIt is live, so it will also be removed from news.dot1.media and the app. This cannot be undone.`
+      : `Delete this story?\n\n"${label}"\n\nThis cannot be undone.`;
+    if (!window.confirm(msg)) return;
+    try { await api(`/api/stories/${id}`, { method: "DELETE" }); await load(); }
+    catch (e: any) { alert(e?.message || "Delete failed."); }
   }
   const [q, setQ] = useState("");
   const [loaded, setLoaded] = useState(false);
@@ -82,7 +90,7 @@ function StoriesInner() {
           )}
           <div className="table-wrap"><table className="grid-t">
             <thead>
-              <tr><th style={{ width: 28 }}><input type="checkbox" aria-label="Select all" checked={stories.length > 0 && sel.size === stories.length} onChange={(e) => setSel(e.target.checked ? new Set(stories.map((x) => x.id)) : new Set())} /></th><th>Headline</th><th>Class</th><th>Status</th><th>Priority</th><th>Deadline</th><th>Review</th><th>Updated</th></tr>
+              <tr><th style={{ width: 28 }}><input type="checkbox" aria-label="Select all" checked={stories.length > 0 && sel.size === stories.length} onChange={(e) => setSel(e.target.checked ? new Set(stories.map((x) => x.id)) : new Set())} /></th><th>Headline</th><th>Class</th><th>Status</th><th>Priority</th><th>Deadline</th><th>Review</th><th>Updated</th>{can("story.delete") && <th style={{ width: 40 }} aria-label="Delete"></th>}</tr>
             </thead>
             <tbody>
               {stories.map((s) => (
@@ -102,6 +110,11 @@ function StoriesInner() {
                   <td><DeadlineBadge deadline={s.deadline} status={s.status} /></td>
                   <td><ReviewBadge state={s.review_state} /></td>
                   <td className="tiny muted">{new Date(s.updated_at).toLocaleDateString()}</td>
+                  {can("story.delete") && (
+                    <td style={{ width: 40 }} onClick={(e) => e.stopPropagation()}>
+                      <button className="btn ghost sm" style={{ color: "#e88" }} title="Delete story" onClick={() => del(s.id, s.final_headline || s.working_headline || "this story", s.status === "published" || !!s.news_story_id)}><Trash2 size={13} /></button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

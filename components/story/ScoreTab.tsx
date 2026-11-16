@@ -64,7 +64,7 @@ export default function ScoreTab({ data, reload, can }: { data: any; reload: () 
         <div className="row-between">
           <div>
             <div style={{ display: "flex", gap: 20 }}>
-              {[["BAI", totals.biblicalAlignment], ["PSI", totals.propheticSignificance], ["SCI", totals.sourceCredibility], ["HII", totals.humanities]].map(([k, v]) => (
+              {[["SG", totals.biblicalAlignment], ["KS", totals.propheticSignificance], ["SC", totals.sourceCredibility], ["FE", totals.humanities]].map(([k, v]) => (
                 <div key={k as string} style={{ textAlign: "center" }}>
                   <div className="disp" style={{ fontSize: 26, fontWeight: 700 }}>{v}<span className="muted" style={{ fontSize: 12 }}>/10</span></div>
                   <div className="mini">{k}</div>
@@ -152,7 +152,7 @@ export default function ScoreTab({ data, reload, can }: { data: any; reload: () 
 
       <div className="card pad stack">
         <div>
-          <label className="f">Reader interpretation <span className="muted">(D1-4LS v2.1, shown on the app and site; 2 to 4 sentences, bounded: no claims of truth, prophecy, or endorsement from the score)</span></label>
+          <label className="f">Reader interpretation <span className="muted">(D1-4LS v3.0, shown on the app and site; 2 to 4 sentences, bounded: no claims of truth, prophecy, or endorsement from the score)</span></label>
           <textarea className="in" value={interpretation} disabled={!editable} onChange={(e) => { setInterpretation(e.target.value); setSaved(false); }} style={{ minHeight: 90 }} placeholder="Describe the profile's distinctive features, the key sourcing strength or limitation, and any boundary a reader might misread." />
         </div>
         <div>

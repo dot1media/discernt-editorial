@@ -101,10 +101,10 @@ function DualRateDiagram() {
     <Frame w={770} h={150} title="DUAL-RATER — SCORE TAB">
       <rect x="20" y="40" width="180" height="44" rx="7" fill={BONE + "0c"} stroke={BONE + "33"} />
       <T x="34" y="60" fontSize="12" fontWeight="700" fill={BONE}>AI scorer</T>
-      <T x="34" y="76" fontSize="10.5" fill={BONE + "99"}>BAI 8 · PSI 6 · SCI 7 · HII 8</T>
+      <T x="34" y="76" fontSize="10.5" fill={BONE + "99"}>SG 8 · KS 6 · SC 7 · FE 8</T>
       <rect x="20" y="92" width="180" height="44" rx="7" fill={BONE + "0c"} stroke={BONE + "33"} />
       <T x="34" y="112" fontSize="12" fontWeight="700" fill={BONE}>You (human)</T>
-      <T x="34" y="128" fontSize="10.5" fill={BONE + "99"}>BAI 7 · PSI 6 · SCI 7 · HII 8</T>
+      <T x="34" y="128" fontSize="10.5" fill={BONE + "99"}>SG 7 · KS 6 · SC 7 · FE 8</T>
       <path d="M 205 88 L 250 88" stroke={GOLD + "bb"} strokeWidth="2" markerEnd="url(#ah2)" />
       <rect x="255" y="62" width="210" height="52" rx="8" fill={GOLD + "18"} stroke={GOLD + "88"} />
       <T x="360" y="84" textAnchor="middle" fontSize="12" fontWeight="700" fill={GOLD}>Reconciled</T>

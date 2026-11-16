@@ -98,10 +98,10 @@ export function ScoreProfile({ scores }: { scores: any }) {
   if (!scores?.totals) return <span className="muted tiny">Not scored</span>;
   const t = scores.totals;
   const rows = [
-    { label: "BAI", val: t.biblicalAlignment },
-    { label: "PSI", val: t.propheticSignificance },
-    { label: "SCI", val: t.sourceCredibility },
-    { label: "HII", val: t.humanities },
+    { label: "SG", val: t.biblicalAlignment },
+    { label: "KS", val: t.propheticSignificance },
+    { label: "SC", val: t.sourceCredibility },
+    { label: "FE", val: t.humanities },
   ];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5, minWidth: 180 }}>

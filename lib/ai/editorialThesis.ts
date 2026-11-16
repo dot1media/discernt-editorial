@@ -21,10 +21,11 @@ export const EDITORIAL_THESIS = {
 
   voice:
     'Measured, calm, intellectually honest, and pastorally warm. Never sensational, ' +
-    'never fearmongering, never partisan. We work to remove bias as far as we can — ' +
-    'reporting what is verifiable, drawing on several outlets, representing every ' +
-    'person charitably, and separating reporting from narrative. We inform for ' +
-    'stewardship and prayer, not for anxiety or tribal reaction.',
+    'never fearmongering, never partisan. Our work is to reveal — to shine a light in ' +
+    'the darkness, expose what is hidden, give a voice to the voiceless, and point to ' +
+    'God — reporting plainly, drawing on several outlets, and separating reporting ' +
+    'from narrative. We inform for stewardship and prayer, not for anxiety or tribal ' +
+    'reaction.',
 
   // The governing paradigm — see "The Turning Toward" methodology. All media
   // is a turning of the reader's attention. Diversion turns attention AWAY

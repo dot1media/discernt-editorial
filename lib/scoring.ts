@@ -69,9 +69,9 @@ export const INDICATOR_DB_COLUMN: Record<keyof IndicatorScores, string> = {
   hiiChristModeledCare: "hii_christ_modeled_care",
 };
 
-export const INDEX_META: { key: "BAI" | "PSI" | "SCI" | "HII"; name: string; indicators: { key: keyof IndicatorScores; label: string; anchors: [string, string, string] }[] }[] = [
+export const INDEX_META: { key: "SG" | "KS" | "SC" | "FE"; name: string; indicators: { key: keyof IndicatorScores; label: string; anchors: [string, string, string] }[] }[] = [
   {
-    key: "BAI", name: "Scriptural Grounding",
+    key: "SG", name: "Scriptural Grounding",
     indicators: [
       { key: "baiScripturalConsistency", label: "Scriptural Consistency", anchors: ["Contradicts clear biblical teaching", "Neutral or indirect alignment", "Explicitly consistent with Scripture"] },
       { key: "baiDoctrinalIntegrity", label: "Doctrinal Soundness", anchors: ["Affirms false or heretical claims", "Avoids error but lacks clarity", "Consistent with the historic Christian faith"] },
@@ -81,7 +81,7 @@ export const INDEX_META: { key: "BAI" | "PSI" | "SCI" | "HII"; name: string; ind
     ],
   },
   {
-    key: "PSI", name: "Kingdom Significance",
+    key: "KS", name: "Kingdom Significance",
     indicators: [
       { key: "psiTextualLinkage", label: "Gospel Advance", anchors: ["No gospel bearing", "Indirect bearing on the gospel", "The gospel clearly advancing"] },
       { key: "psiEschatologicalFit", label: "Movement of God", anchors: ["No sign of God at work", "Possible but unclear", "A documented move of God: revival, awakening, the church growing or enduring"] },
@@ -91,7 +91,7 @@ export const INDEX_META: { key: "BAI" | "PSI" | "SCI" | "HII"; name: string; ind
     ],
   },
   {
-    key: "SCI", name: "Source Credibility",
+    key: "SC", name: "Source Credibility",
     indicators: [
       { key: "sciPrimarySourceAccess", label: "Primary-Source Access", anchors: ["No primary sourcing", "Some primary access", "Firsthand accounts, named witnesses, or primary documents"] },
       { key: "sciVerification", label: "Verification & Corroboration", anchors: ["Unverified", "Partially corroborated", "Independently corroborated, especially any miracle or healing claim"] },
@@ -101,7 +101,7 @@ export const INDEX_META: { key: "BAI" | "PSI" | "SCI" | "HII"; name: string; ind
     ],
   },
   {
-    key: "HII", name: "Fruit & Edification",
+    key: "FE", name: "Fruit & Edification",
     indicators: [
       { key: "hiiHumanDignity", label: "Faith Encouragement", anchors: ["Discourages or corrodes faith", "Neutral", "Strengthens and encourages faith"] },
       { key: "hiiCompassionEmpathy", label: "Compassion & Mercy", anchors: ["Callous", "Detached", "Genuinely compassionate and merciful"] },

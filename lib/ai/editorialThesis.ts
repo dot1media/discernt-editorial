@@ -21,8 +21,10 @@ export const EDITORIAL_THESIS = {
 
   voice:
     'Measured, calm, intellectually honest, and pastorally warm. Never sensational, ' +
-    'never fearmongering, never partisan. We inform for stewardship and prayer, not ' +
-    'for anxiety or tribal reaction.',
+    'never fearmongering, never partisan. We work to remove bias as far as we can — ' +
+    'reporting what is verifiable, drawing on several outlets, representing every ' +
+    'person charitably, and separating reporting from narrative. We inform for ' +
+    'stewardship and prayer, not for anxiety or tribal reaction.',
 
   // The governing paradigm — see "The Turning Toward" methodology. All media
   // is a turning of the reader's attention. Diversion turns attention AWAY
@@ -107,54 +109,48 @@ export function isTooSensational(title: string): boolean {
 }
 
 /* ------------------------------------------------------------------ *
- * Editorial scope filter
+ * Editorial scope filter — Discernt
  *
- * The paper's beat is deliberately narrow: Alaska first, then US politics
- * and religion, plus national stories that plausibly reach Alaska or the
- * whole country. A story must match at least one lane to be selected.
+ * Discernt's beat is the kingdom of God at work in the world: faith and
+ * hope, redemption in Christ, answered prayer, revival and the church
+ * growing, miracles reported with care, works of mercy and justice done
+ * in Jesus' name, and the courage of the persecuted church — among every
+ * people and language. A story must carry a faith/kingdom signal (in its
+ * headline, summary, tags, or feed category) to be in scope. General
+ * politics, crime, business, tech, sports, and lifestyle items are out
+ * unless they are genuinely a story of God at work.
  *
- * This runs at candidate-selection time, on the headline (and any feed
- * tags/summary passed in). It is intentionally generous on the Alaska and
- * politics/faith lanes and stricter on everything else, so a routine world,
- * tech, or lifestyle item that has nothing to do with the beat is dropped.
+ * This runs at candidate-selection time on the headline (and any feed
+ * tags/summary passed in). It is intentionally generous about what counts
+ * as a faith signal and strict about everything else.
  * ------------------------------------------------------------------ */
 
-const ALASKA_TERMS = [
-  'alaska', 'alaskan', 'anchorage', 'fairbanks', 'juneau', 'wasilla', 'palmer',
-  'mat-su', 'matanuska', 'susitna', 'kenai', 'kodiak', 'sitka', 'ketchikan',
-  'bethel', 'nome', 'utqiagvik', 'barrow', 'prudhoe', 'denali', 'aleutian',
-  'arctic', 'permanent fund', 'pfd', 'north slope', 'iditarod', 'anwr',
-  'murkowski', 'sullivan', 'dunleavy', 'peltola', 'alaska native', 'inupiat',
-  'yupik', "yup'ik", 'tlingit', 'athabascan', 'aleut', 'bering',
-];
-
-const POLITICS_TERMS = [
-  'congress', 'senate', 'house of representatives', 'white house', 'president',
-  'biden', 'trump', 'supreme court', 'scotus', 'federal', 'legislation', 'bill',
-  'governor', 'election', 'campaign', 'ballot', 'vote', 'republican', 'democrat',
-  'gop', 'capitol', 'washington', 'policy', 'lawmakers', 'senator', 'governor',
-  'department of', 'administration', 'cabinet', 'executive order', 'filibuster',
-  'impeach', 'nomination', 'confirmation', 'primary', 'midterm', 'referendum',
-  'legislature', 'statehouse', 'attorney general', 'pentagon', 'state department',
-];
-
+// Core faith vocabulary — Christianity, the church, Scripture, and the people
+// and practices of the faith.
 const FAITH_TERMS = [
   'church', 'christian', 'christianity', 'faith', 'jesus', 'christ', 'gospel',
   'bible', 'biblical', 'scripture', 'pastor', 'ministry', 'congregation',
   'religious', 'religion', 'catholic', 'protestant', 'evangelical', 'baptist',
-  'denomination', 'worship', 'prayer', 'clergy', 'missionary', 'theology',
-  'diocese', 'parish', 'sermon', 'chaplain', 'persecution', 'revival',
-  'discipleship', 'sanctity', 'pro-life', 'religious liberty', 'first amendment',
+  'pentecostal', 'orthodox', 'anglican', 'methodist', 'presbyterian',
+  'denomination', 'worship', 'prayer', 'prayed', 'clergy', 'missionary',
+  'missions', 'mission', 'theology', 'diocese', 'parish', 'sermon', 'chaplain',
+  'disciple', 'discipleship', 'believer', 'believers', 'faithful', 'christlike',
+  'kingdom of god', 'kingdom of heaven', 'holy spirit', 'cross', 'resurrection',
 ];
 
-// National-reach signals: a story with no local hook can still qualify if it
-// plainly affects the whole country (and therefore Alaska too).
-const NATIONAL_REACH_TERMS = [
-  'nationwide', 'across the country', 'americans', 'u.s. economy', 'us economy',
-  'inflation', 'interest rate', 'federal reserve', 'gas prices', 'fuel prices',
-  'national security', 'immigration', 'border', 'tariff', 'supreme court',
-  'social security', 'medicare', 'medicaid', 'veterans', 'military', 'defense',
-  'oil', 'energy', 'fisheries', 'climate policy', 'public lands',
+// Kingdom signals — the specific kinds of story Discernt exists to tell:
+// God visibly at work, lives changed, prayer answered, the church enduring.
+const KINGDOM_TERMS = [
+  'redemption', 'redeemed', 'redemptive', 'salvation', 'saved', 'born again',
+  'testimony', 'testimonies', 'conversion', 'converted', 'came to faith',
+  'baptism', 'baptized', 'baptised', 'revival', 'revivals', 'awakening',
+  'answered prayer', 'answer to prayer', 'miracle', 'miracles', 'miraculous',
+  'healing', 'healed', 'deliverance', 'transformed', 'transformation',
+  'restoration', 'restored', 'forgiveness', 'reconciliation', 'reconciled',
+  'persecution', 'persecuted', 'martyr', 'martyrdom', 'underground church',
+  'house church', 'the church grows', 'church growth', 'planted a church',
+  'church planting', 'evangelism', 'evangelist', 'outreach', 'hope in christ',
+  'movement of god', 'move of god', 'faith community', 'answered prayers',
 ];
 
 function anyTermIn(haystack: string, terms: string[]): boolean {
@@ -163,9 +159,9 @@ function anyTermIn(haystack: string, terms: string[]): boolean {
 }
 
 /**
- * Returns true if a story fits the paper's beat. `category` is the feed's
- * own category, used as a soft signal (faith/politics feeds lean in-scope
- * even when the headline is terse).
+ * Returns true if a story fits Discernt's beat: a story of faith or of God's
+ * kingdom at work. `category` is the feed's own category, used as a soft
+ * signal (a faith-category feed leans in-scope even when the headline is terse).
  */
 export function isInScope(
   title: string,
@@ -173,21 +169,16 @@ export function isInScope(
 ): boolean {
   const hay = [title, opts.summary || '', ...(opts.tags || [])].join(' ').toLowerCase();
 
-  // Lane 1: anything Alaska is always in scope.
-  if (anyTermIn(hay, ALASKA_TERMS)) return true;
-
-  // Lane 2: US politics — headline signals, or a politics-category feed.
-  if (anyTermIn(hay, POLITICS_TERMS)) return true;
-  if (opts.category === 'politics') return true;
-
-  // Lane 3: religion — headline signals, or a faith-category feed.
-  if (anyTermIn(hay, FAITH_TERMS)) return true;
+  // A faith-category feed is in scope by default.
   if (opts.category === 'faith') return true;
 
-  // Lane 4: national-reach stories that affect the whole country (and AK).
-  if (anyTermIn(hay, NATIONAL_REACH_TERMS)) return true;
+  // Core faith vocabulary.
+  if (anyTermIn(hay, FAITH_TERMS)) return true;
 
-  // Everything else (routine world/tech/culture/health/business/lifestyle) is
-  // out of scope for this paper.
+  // Kingdom signals — the stories Discernt most wants to tell.
+  if (anyTermIn(hay, KINGDOM_TERMS)) return true;
+
+  // Everything else (general politics, crime, business, tech, sports,
+  // lifestyle with no faith hook) is out of scope.
   return false;
 }

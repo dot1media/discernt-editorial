@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 // Blob snapshot of this at publish time.
 
 const INK = "#141210";
-const CRIMSON = "#B81616";
+const CRIMSON = "#C79A2E";
 const BONE = "#F4F0E7";
 const GOLD = "#C8A24A";
 const MUTED = "#9A9186";

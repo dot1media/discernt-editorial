@@ -11,7 +11,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <Link href="/policy/standards" style={{ fontFamily: "'Bodoni Moda', serif", fontWeight: 800, fontSize: 22, color: "#141210", textDecoration: "none" }}>
             Discernt
           </Link>
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, letterSpacing: "0.22em", color: "#b81616" }}>
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, letterSpacing: "0.22em", color: "#c8a24a" }}>
             A DECLARED STANDPOINT
           </span>
         </div>
@@ -35,7 +35,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
 function PublicLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link href={href} style={{ color: "#8f1111", textDecoration: "none", fontWeight: 600 }}>
+    <Link href={href} style={{ color: "#8f6f1f", textDecoration: "none", fontWeight: 600 }}>
       {label}
     </Link>
   );

@@ -16,7 +16,7 @@ export default async function StandardsPublicPage() {
       </p>
 
       <div style={{ background: "#fff", border: "1px solid rgba(20,18,16,.1)", borderRadius: 12, padding: "24px 28px", marginBottom: 32 }}>
-        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: "0.2em", color: "#b81616", marginBottom: 16 }}>
+        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: "0.2em", color: "#c8a24a", marginBottom: 16 }}>
           OUR CORE STANDARDS
         </div>
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
@@ -29,7 +29,7 @@ export default async function StandardsPublicPage() {
       </div>
 
       <div style={{ marginBottom: 32 }}>
-        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: "0.2em", color: "#b81616", marginBottom: 14 }}>
+        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: "0.2em", color: "#c8a24a", marginBottom: 14 }}>
           HOW WE LABEL OUR WORK
         </div>
         <div style={{ display: "grid", gap: 12 }}>

@@ -1,7 +1,7 @@
 {
-  "name": "Dot 1 News · Newsroom",
+  "name": "Discernt · Newsroom",
   "short_name": "Newsroom",
-  "description": "The Dot 1 News editorial back-office: stories, review, publishing, and broadcast.",
+  "description": "The Discernt editorial back-office: stories, review, publishing, and broadcast.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

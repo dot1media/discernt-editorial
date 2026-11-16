@@ -25,7 +25,7 @@ export default async function CorrectionsPublicPage() {
       <PageTitle>{page?.title || "Corrections & Clarifications"}</PageTitle>
       <Prose body={page?.body || ""} />
 
-      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: "0.2em", color: "#b81616", margin: "32px 0 16px" }}>
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: "0.2em", color: "#c8a24a", margin: "32px 0 16px" }}>
         THE RECORD
       </div>
 

@@ -26,7 +26,7 @@ export default function DigestPage() {
         ${s.hero_image ? `<a href="${storyUrl(s)}"><img src="${esc(s.hero_image)}" alt="" width="560" style="display:block;width:100%;max-width:560px;border-radius:8px;margin-bottom:10px"/></a>` : ""}
         <div style="font-family:Georgia,'Bodoni Moda',serif;font-size:20px;font-weight:700;color:#141210;line-height:1.25"><a href="${storyUrl(s)}" style="color:#141210;text-decoration:none">${esc(s.final_headline || s.working_headline)}</a></div>
         ${s.summary ? `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#33322d;line-height:1.55;margin-top:6px">${esc(s.summary)}</div>` : ""}
-        <div style="margin-top:8px"><a href="${storyUrl(s)}" style="font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#b81616;text-decoration:none;font-weight:700">Read the story &rarr;</a></div>
+        <div style="margin-top:8px"><a href="${storyUrl(s)}" style="font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#8a6a17;text-decoration:none;font-weight:700">Read the story &rarr;</a></div>
       </td></tr>`).join("");
     return `<!doctype html><html><body style="margin:0;background:#f4f0e7;padding:24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fbf8f2;border-radius:12px;padding:28px 24px">
@@ -34,7 +34,7 @@ export default function DigestPage() {
   <tr><td style="font-family:Georgia,'Bodoni Moda',serif;font-size:28px;font-weight:700;color:#141210;padding:6px 0 4px">${esc(title)}</td></tr>
   ${intro ? `<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#33322d;line-height:1.6;padding:6px 0 10px">${esc(intro).replace(/\n/g, "<br/>")}</td></tr>` : ""}
   ${items}
-  <tr><td style="padding-top:18px;border-top:1px solid #e2ded4;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#6f6d65;line-height:1.6">Reporting from the Mat-Su Valley and Alaska. <a href="${NEWS}" style="color:#b81616">news.dot1.media</a></td></tr>
+  <tr><td style="padding-top:18px;border-top:1px solid #e2ded4;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#6f6d65;line-height:1.6">Reporting from the Mat-Su Valley and Alaska. <a href="${NEWS}" style="color:#8a6a17">news.dot1.media</a></td></tr>
 </table></td></tr></table></body></html>`;
   }, [chosen, title, intro, from, to]);
   const text = useMemo(() => `${title}\n${from} to ${to}\n${intro ? "\n" + intro + "\n" : ""}\n` + chosen.map((s) => `${s.final_headline || s.working_headline}\n${s.summary ? s.summary + "\n" : ""}${storyUrl(s)}\n`).join("\n") + `\n${NEWS}`, [chosen, title, intro, from, to]);

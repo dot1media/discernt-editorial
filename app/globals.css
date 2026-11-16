@@ -9,8 +9,8 @@
   --dim: rgba(244, 240, 231, 0.64);
   --dimmer: rgba(244, 240, 231, 0.42);
   --hover: rgba(244, 240, 231, 0.055);
-  --crimson: #b81616;
-  --deep: #8f1111;
+  --crimson: #8a6a17;
+  --deep: #6f5512;
   --gold: #c8a24a;
   --ok: #3f8f5f;
   --warn: #c8a24a;
@@ -114,7 +114,7 @@ textarea.in { resize: vertical; min-height: 90px; line-height: 1.5; }
 
 /* Chips + status pills */
 .chip { display: inline-flex; align-items: center; gap: 6px; font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim); }
-.chip.crimson { background: rgba(184, 22, 22, 0.16); border-color: var(--crimson); color: #ffb4b4; }
+.chip.crimson { background: rgba(138, 106, 23, 0.18); border-color: var(--crimson); color: #e4cd8c; }
 .chip.gold { background: rgba(200, 162, 74, 0.16); border-color: var(--gold); color: var(--gold); }
 .chip.ok { background: rgba(63, 143, 95, 0.16); border-color: var(--ok); color: #8fd6a8; }
 .chip.dim { color: var(--dimmer); }

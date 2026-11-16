@@ -38,7 +38,7 @@ export function Form({ f, set, submit, err, busy, showSubject }: any) {
 
       {err && <div style={{ color: "#b81616", fontSize: 14, marginBottom: 14, fontFamily: "Archivo, sans-serif" }}>{err}</div>}
 
-      <button type="submit" disabled={busy} style={{ background: "#b81616", color: "#f4f0e7", border: "none", borderRadius: 8, padding: "12px 24px", fontSize: 15, fontWeight: 700, fontFamily: "Archivo, sans-serif", cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}>
+      <button type="submit" disabled={busy} style={{ background: "#8a6a17", color: "#f4f0e7", border: "none", borderRadius: 8, padding: "12px 24px", fontSize: 15, fontWeight: 700, fontFamily: "Archivo, sans-serif", cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}>
         {busy ? "Sending…" : "Send to the newsroom"}
       </button>
     </form>

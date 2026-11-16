@@ -37,20 +37,37 @@ export interface FeedSource {
 }
 
 export const DEFAULT_FEEDS: FeedSource[] = [
-  // ── Discernt beat: reputable faith news — stories of God at work, the
-  //    gospel advancing, redemption, revival, answered prayer, the
-  //    persecuted church. Feeds that fail are skipped; override with
-  //    PIPELINE_FEEDS at deploy time. The app's discovery agents reach far
-  //    wider (world news, many languages); these feeds seed the AI Desk.
+  // ── Discernt beat: reputable Christian news outlets covering God's work —
+  //    the gospel advancing, church growth, redemption, revival, answered
+  //    prayer, testimony, and the persecuted church. Grouped by lane below.
+  //    Feeds that fail are skipped at runtime; override with PIPELINE_FEEDS
+  //    at deploy time. The app's per-beat discovery scouts reach far wider
+  //    (world news, local languages); these feeds seed the AI Desk.
+  //
+  //    NOTE: Open Doors and CBN feed URLs are best-effort and should be
+  //    confirmed against the live sites — if one 404s it is simply skipped,
+  //    and the per-beat scouts surface that outlet's stories via web search
+  //    regardless.
+
+  // Missions & church growth
   { id: 'mnn', name: 'Mission Network News', url: 'https://www.mnnonline.org/feed/', category: 'world', sciBaseline: { transparency: 2, trackRecord: 2, editorialStandards: 1 }, enabled: true },
-  { id: 'christianity-today', name: 'Christianity Today', url: 'https://feeds.christianitytoday.com/christianitytoday/ctmag', category: 'faith', sciBaseline: { transparency: 2, trackRecord: 2, editorialStandards: 2 }, enabled: true },
-  { id: 'christian-post', name: 'The Christian Post', url: 'https://www.christianpost.com/rss', category: 'faith', sciBaseline: { transparency: 2, trackRecord: 1, editorialStandards: 1 }, enabled: true },
-  { id: 'religion-news', name: 'Religion News Service', url: 'https://religionnews.com/feed/', category: 'world', sciBaseline: { transparency: 2, trackRecord: 2, editorialStandards: 2 }, enabled: true },
   { id: 'baptist-press', name: 'Baptist Press', url: 'https://www.baptistpress.com/feed/', category: 'faith', sciBaseline: { transparency: 2, trackRecord: 1, editorialStandards: 1 }, enabled: true },
-  { id: 'gospel-coalition', name: 'The Gospel Coalition', url: 'https://www.thegospelcoalition.org/feed/', category: 'culture', sciBaseline: { transparency: 2, trackRecord: 1, editorialStandards: 1 }, enabled: true },
+
+  // Global faith reporting
+  { id: 'christianity-today', name: 'Christianity Today', url: 'https://feeds.christianitytoday.com/christianitytoday/ctmag', category: 'faith', sciBaseline: { transparency: 2, trackRecord: 2, editorialStandards: 2 }, enabled: true },
+  { id: 'religion-news', name: 'Religion News Service', url: 'https://religionnews.com/feed/', category: 'world', sciBaseline: { transparency: 2, trackRecord: 2, editorialStandards: 2 }, enabled: true },
   { id: 'catholic-news-agency', name: 'Catholic News Agency', url: 'https://www.catholicnewsagency.com/rss/news.xml', category: 'world', sciBaseline: { transparency: 2, trackRecord: 2, editorialStandards: 1 }, enabled: true },
-  { id: 'christian-today', name: 'Christian Today', url: 'https://www.christiantoday.com/rss/', category: 'faith', sciBaseline: { transparency: 1, trackRecord: 1, editorialStandards: 1 }, enabled: true },
+
+  // Persecuted church
+  { id: 'open-doors', name: 'Open Doors', url: 'https://www.opendoors.org/en-US/feed/', category: 'world', sciBaseline: { transparency: 2, trackRecord: 2, editorialStandards: 1 }, enabled: true },
+
+  // Testimony & revival
+  { id: 'cbn-news', name: 'CBN News', url: 'https://www2.cbn.com/rss/cbnnews.xml', category: 'world', sciBaseline: { transparency: 1, trackRecord: 1, editorialStandards: 1 }, enabled: true },
   { id: 'premier-christian', name: 'Premier Christian News', url: 'https://premierchristian.news/en/rss.xml', category: 'world', sciBaseline: { transparency: 1, trackRecord: 1, editorialStandards: 1 }, enabled: true },
+
+  // Additional reputable faith outlets
+  { id: 'gospel-coalition', name: 'The Gospel Coalition', url: 'https://www.thegospelcoalition.org/feed/', category: 'culture', sciBaseline: { transparency: 2, trackRecord: 1, editorialStandards: 1 }, enabled: true },
+  { id: 'christian-post', name: 'The Christian Post', url: 'https://www.christianpost.com/rss', category: 'faith', sciBaseline: { transparency: 2, trackRecord: 1, editorialStandards: 1 }, enabled: true },
 ];
 
 /** Category → fallback hero image (matches the visual style already used in-app). */

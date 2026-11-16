@@ -10,7 +10,7 @@ import { PlayCircle, Compass } from "lucide-react";
 // Visuals are clean SVG illustrations of the real screens (not live captures) so the doc stays
 // current and legible on any theme.
 
-const GOLD = "#c8a24a", CRIMSON = "#b81616", BONE = "#f4f0e7", MUTED = "#8f887c";
+const GOLD = "#c8a24a", CRIMSON = "#c8a24a", BONE = "#f4f0e7", MUTED = "#8f887c";
 
 const ROLE_COLOR: Record<string, string> = {
   Owner: GOLD, Editor: CRIMSON, Reporter: "#6ea8fe", Producer: "#5bbf9a", Viewer: MUTED, Auto: "#b98cff",

@@ -88,9 +88,9 @@ export default function Shell({
         <div className="brand">
           <div>
             <div className="wm">
-              DOT <img className="gmark" src="/brand/d1-mark-crimson.gif" alt="1" /> NEWS
+              <img className="gmark" src="/brand/discernt-emblem.png" alt="Discernt" /> DISCERNT
             </div>
-            <div className="s">EDITORIAL</div>
+            <div className="s">EDITORIAL &middot; INTERPRETING THE TIMES</div>
           </div>
         </div>
         <nav className="nav">

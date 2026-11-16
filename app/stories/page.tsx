@@ -26,7 +26,7 @@ function StoriesInner() {
   }
   async function del(id: string, label: string, published: boolean) {
     const msg = published
-      ? `Delete this story?\n\n"${label}"\n\nIt is live, so it will also be removed from news.dot1.media and the app. This cannot be undone.`
+      ? `Delete this story?\n\n"${label}"\n\nIt is live, so it will also be removed from discernt.dot1.media and the app. This cannot be undone.`
       : `Delete this story?\n\n"${label}"\n\nThis cannot be undone.`;
     if (!window.confirm(msg)) return;
     try { await api(`/api/stories/${id}`, { method: "DELETE" }); await load(); }

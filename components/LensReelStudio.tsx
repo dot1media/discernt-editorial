@@ -112,7 +112,7 @@ export default function LensReelStudio() {
             <Check size={13} /> Posted to {done.kind === "photo" ? "The Lens" : "The Reel"}.
           </div>
           {done.kind === "video" && (
-            <a className="btn ghost sm" style={{ marginTop: 8 }} href={`https://news.dot1.media/v/${encodeURIComponent(done.newsId)}`} target="_blank" rel="noreferrer">
+            <a className="btn ghost sm" style={{ marginTop: 8 }} href={`https://discernt.dot1.media/v/${encodeURIComponent(done.newsId)}`} target="_blank" rel="noreferrer">
               <ExternalLink size={12} /> View in the app
             </a>
           )}

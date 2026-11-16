@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Shell from "@/components/Shell";
 import { api } from "@/lib/client";
 
-const NEWS = "https://news.dot1.media";
+const NEWS = "https://discernt.dot1.media";
 const storyUrl = (s: any) => (s.news_story_id ? `${NEWS}/s/n/${s.news_story_id}` : NEWS);
 const esc = (t: string) => String(t || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const iso = (d: Date) => d.toISOString().slice(0, 10);
@@ -34,7 +34,7 @@ export default function DigestPage() {
   <tr><td style="font-family:Georgia,'Bodoni Moda',serif;font-size:28px;font-weight:700;color:#141210;padding:6px 0 4px">${esc(title)}</td></tr>
   ${intro ? `<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#33322d;line-height:1.6;padding:6px 0 10px">${esc(intro).replace(/\n/g, "<br/>")}</td></tr>` : ""}
   ${items}
-  <tr><td style="padding-top:18px;border-top:1px solid #e2ded4;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#6f6d65;line-height:1.6">Reporting from the Mat-Su Valley and Alaska. <a href="${NEWS}" style="color:#8a6a17">news.dot1.media</a></td></tr>
+  <tr><td style="padding-top:18px;border-top:1px solid #e2ded4;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#6f6d65;line-height:1.6">Reporting from the Mat-Su Valley and Alaska. <a href="${NEWS}" style="color:#8a6a17">discernt.dot1.media</a></td></tr>
 </table></td></tr></table></body></html>`;
   }, [chosen, title, intro, from, to]);
   const text = useMemo(() => `${title}\n${from} to ${to}\n${intro ? "\n" + intro + "\n" : ""}\n` + chosen.map((s) => `${s.final_headline || s.working_headline}\n${s.summary ? s.summary + "\n" : ""}${storyUrl(s)}\n`).join("\n") + `\n${NEWS}`, [chosen, title, intro, from, to]);

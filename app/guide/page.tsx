@@ -61,7 +61,7 @@ function FlowDiagram() {
     { x: 168, label: "Review", lines: ["claims", "checklist", "editor OK"] },
     { x: 322, label: "Dual-rate", lines: ["AI + human", "score"] },
     { x: 476, label: "Publish", lines: ["to news DB"] },
-    { x: 630, label: "Readers", lines: ["news.dot1.media", "the app"] },
+    { x: 630, label: "Readers", lines: ["discernt.dot1.media", "the app"] },
   ];
   return (
     <Frame w={770} h={150} title="HOW A STORY REACHES READERS">
@@ -220,7 +220,7 @@ function SocialMock() {
 }
 
 const WALK_STEPS: WalkStep[] = [
-  { tag: "The big picture", title: "One pipeline, every story", body: "However a story starts, a reporter, the AI Desk, or a public tip, it moves through the same path: reporting and sources, verification, editorial review, scoring, then publication to news.dot1.media and the app.", art: <FlowDiagram /> },
+  { tag: "The big picture", title: "One pipeline, every story", body: "However a story starts, a reporter, the AI Desk, or a public tip, it moves through the same path: reporting and sources, verification, editorial review, scoring, then publication to discernt.dot1.media and the app.", art: <FlowDiagram /> },
   { tag: "Where stories begin", title: "Generate drafts from the wire", body: "Open AI Desk and press Generate now. It pulls the wire, writes drafts, scores them, and drops each in as a story in the Verification stage marked AI. A background schedule does this on its own too. Every AI draft still clears the full review workflow.", art: <AiDeskMock /> },
   { tag: "Move it up", title: "Verify and climb the ladder", body: "The review status is computed from the actual work, not set by hand. Handle each verification claim and finish the checklist, and the story climbs the ladder on its own toward Ready to Publish.", art: <LadderDiagram /> },
   { tag: "Score it", title: "Dual-rate the D1-4LS score", body: "Four indices, five indicators each, 0 to 2, out of 40. On an AI story the AI scorer rates first; a person adds the second rating on the Score tab. Close raters average; if they diverge, a third breaks the tie.", art: <DualRateDiagram /> },
@@ -234,7 +234,7 @@ const TOUR_STEPS: TourStep[] = [
   { selector: '.side a[href="/ai"]', title: "AI Desk", body: "Generate drafts from the wire. Each one lands as a story in Verification, marked AI, and goes through the full workflow.", placement: "right" },
   { selector: '.side a[href="/review"]', title: "Review Queue", body: "Where stories waiting on verification and editor approval gather. Clear claims and the checklist to move them up the ladder.", placement: "right" },
   { selector: '.side a[href="/social"]', title: "Social — Make Discernt Seen", body: "Turn published stories into branded Instagram and Facebook posts. Review, approve, and schedule or post now. Nothing goes out unapproved.", placement: "right" },
-  { selector: '.side a[href="/published"]', title: "Published", body: "Everything live on news.dot1.media and the app. Edit or remove articles, photos, and videos here; changes are immediate.", placement: "right" },
+  { selector: '.side a[href="/published"]', title: "Published", body: "Everything live on discernt.dot1.media and the app. Edit or remove articles, photos, and videos here; changes are immediate.", placement: "right" },
   { selector: '.side a[href="/broadcast"]', title: "Broadcast", body: "Run the live show and on-air graphics, publish recorded episodes, and go live to the site and app.", placement: "right" },
   { selector: '.side a[href="/accounts"]', title: "Accounts", body: "Owners grant roles and per-person capabilities here. If a page or button is missing for someone, this is where access is granted.", placement: "right" },
   { selector: '.side a[href="/guide"]', title: "Replay any time", body: "You are on the Guide. Both the walkthrough and this tour live here, so you can replay either whenever you need a refresher.", placement: "right" },
@@ -280,7 +280,7 @@ export default function GuidePage() {
         <Section title="The big picture">
           <FlowDiagram />
           <P>A story can start three ways: a reporter writes it, the <b>AI Desk</b> generates it from the wire, or it arrives as a public <b>tip</b>. However it starts, it moves through the same pipeline: reporting and sources, then verification, then editorial review, then scoring, then publication.</P>
-          <P>Publishing writes the story into the news database that powers <b>news.dot1.media</b> and the app. Nothing reaches readers without clearing review. This portal is the newsroom; the app and website only display what the portal publishes.</P>
+          <P>Publishing writes the story into the news database that powers <b>discernt.dot1.media</b> and the app. Nothing reaches readers without clearing review. This portal is the newsroom; the app and website only display what the portal publishes.</P>
         </Section>
 
         <Section title="Create or report a story" who={["Reporter", "Editor", "Owner"]}>
@@ -323,7 +323,7 @@ export default function GuidePage() {
         <Section title="Manage what's already live (Published)" who={["Reporter", "Editor", "Owner"]}>
           <PublishedMock />
           <P>The Published section shows everything on the news site, including older articles from before this system. View is open to everyone; editing an article (headline, summary, body, category, byline, hero image) is a reporter/editor action; deleting articles or media is an editor action. <b>Edits and deletes are immediate and permanent on the live site</b>, no draft, no undo. Scores aren't edited here; re-scoring goes through the workflow.</P>
-          <P><b>What readers now see on the website.</b> On news.dot1.media a published article carries its full text (not just the summary), its colored verification dot, and its D1-4LS rating, which readers can tap to open the full breakdown of all twenty indicators. Everything a reader sees there follows from the status and score you set here.</P>
+          <P><b>What readers now see on the website.</b> On discernt.dot1.media a published article carries its full text (not just the summary), its colored verification dot, and its D1-4LS rating, which readers can tap to open the full breakdown of all twenty indicators. Everything a reader sees there follows from the status and score you set here.</P>
         </Section>
 
         <Section title="Make Discernt Seen (social posts)" who={["Editor", "Owner"]}>
@@ -346,7 +346,7 @@ export default function GuidePage() {
 
         <Section title="Go live to the site and app" who={["Producer", "Owner"]}>
           <P>Live streaming runs through Cloudflare Stream. One-time, a maintainer sets the Cloudflare keys on the portal, then a producer opens Broadcast, then Go live, and presses Set up live input once. That returns an OBS Server URL and a Stream key (keep the key private).</P>
-          <P>To broadcast: put that Server and Stream key into OBS (Settings, Stream, service Custom), Start Streaming, then press <b>Go live</b> in the portal and give it a title. A Live surface appears on news.dot1.media and as a red LIVE banner in the app within seconds. Push lower thirds, bug, ticker, and breaking from On-air graphics exactly as normal. Press <b>End broadcast</b> when done; Cloudflare keeps the recording, which can become a posted episode.</P>
+          <P>To broadcast: put that Server and Stream key into OBS (Settings, Stream, service Custom), Start Streaming, then press <b>Go live</b> in the portal and give it a title. A Live surface appears on discernt.dot1.media and as a red LIVE banner in the app within seconds. Push lower thirds, bug, ticker, and breaking from On-air graphics exactly as normal. Press <b>End broadcast</b> when done; Cloudflare keeps the recording, which can become a posted episode.</P>
           <P>Two normal things: there's a short beat after OBS connects before the stream is playable, and live video always runs a little behind real time. See the printable Live Broadcast Guide above for the full step-by-step.</P>
         </Section>
 

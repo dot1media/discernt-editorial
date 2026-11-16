@@ -59,7 +59,7 @@ export default function MediaCard({ asset, reload, can, onDetach }: { asset: any
   }
 
   // Public, social-shareable page for a published video on the news site.
-  const shareUrl = asset.news_id ? `https://news.dot1.media/v/${encodeURIComponent(asset.news_id)}` : "";
+  const shareUrl = asset.news_id ? `https://discernt.dot1.media/v/${encodeURIComponent(asset.news_id)}` : "";
   async function copyShare() {
     if (!shareUrl) return;
     try { await navigator.clipboard.writeText(shareUrl); } catch { /* ignore */ }
@@ -88,7 +88,7 @@ export default function MediaCard({ asset, reload, can, onDetach }: { asset: any
   }
   async function remove() {
     const msg = published
-      ? "Delete this media permanently? It is live, so it will also be removed from news.dot1.media and the app."
+      ? "Delete this media permanently? It is live, so it will also be removed from discernt.dot1.media and the app."
       : "Delete this media permanently?";
     if (!confirm(msg)) return;
     setErr("");
@@ -167,7 +167,7 @@ export default function MediaCard({ asset, reload, can, onDetach }: { asset: any
 
         {!isImage && published && shareUrl && (
           <div style={{ borderTop: "1px solid var(--line)", marginTop: 4, paddingTop: 10 }}>
-            <div className="tiny muted" style={{ marginBottom: 6 }}>Share this video — plays on news.dot1.media and unfurls with a preview on social.</div>
+            <div className="tiny muted" style={{ marginBottom: 6 }}>Share this video — plays on discernt.dot1.media and unfurls with a preview on social.</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
               <input className="in" readOnly value={shareUrl} onFocus={(e) => e.currentTarget.select()} style={{ flex: "1 1 240px", minWidth: 0, fontSize: 12.5 }} />
               <button className="btn ghost sm" onClick={copyShare}>{copied ? "Copied" : "Copy link"}</button>

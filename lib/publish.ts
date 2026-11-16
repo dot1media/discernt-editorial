@@ -2,7 +2,7 @@ import { newsSql, assertNewsConfigured } from "@/lib/db";
 import { IndicatorScores, computeIndexTotals, normalizeIndicators } from "@/lib/scoring";
 import crypto from "crypto";
 
-// Publishing writes into the SEPARATE news database (news.dot1.media), matching its news_stories
+// Publishing writes into the SEPARATE news database (discernt.dot1.media), matching its news_stories
 // schema exactly. Editorial owns the working record; news owns the published article. We map the
 // D1-4LS indicators onto the twenty bai_/psi_/sci_/hii_ columns, derive the four 0-10 index totals
 // (and the legacy 0-10 fields) from them, and set the D1-4LS metadata. A published story keeps a
@@ -35,7 +35,7 @@ export interface EditorialStoryRow {
 
 // A resizable, branded placeholder shown in place of a rights-restricted source
 // image. Served from the news site. Reused across any story with the same issue.
-const BRAND_FALLBACK_IMAGE = "https://news.dot1.media/story-fallback.png";
+const BRAND_FALLBACK_IMAGE = "https://discernt.dot1.media/story-fallback.png";
 
 const CLASSIFICATION_TO_FORMAT: Record<string, string> = {
   news: "article",
@@ -55,7 +55,7 @@ function prepare(story: EditorialStoryRow) {
   // publish a branded, resizable placeholder instead and credit it to Discernt.
   // Otherwise keep the source image and carry its credit to the article footer.
   const rightsRestricted = !!story.hero_image_rights_restricted;
-  const sourceImage = (story.hero_image || "").trim() || "https://news.dot1.media/placeholder.jpg";
+  const sourceImage = (story.hero_image || "").trim() || "https://discernt.dot1.media/placeholder.jpg";
   const image = rightsRestricted ? BRAND_FALLBACK_IMAGE : sourceImage;
   const imageCredit = rightsRestricted ? "Discernt" : String(story.hero_image_credit || "").trim();
   const ind = normalizeIndicators(story.scores?.indicators || {});
@@ -70,10 +70,10 @@ function prepare(story: EditorialStoryRow) {
     ind, confidence: story.score_confidence || "developing",
     bai: totals.biblicalAlignment, psi: totals.propheticSignificance,
     sci: totals.sourceCredibility, hii: totals.humanities,
-    // D1-4LS v2.1 metadata carried to the public record.
+    // D1-4LS v3.0 metadata carried to the public record.
     interpretation: String(scores.interpretation || "").slice(0, 1200),
     scoreNotes: JSON.stringify(scores.indexNotes || {}),
-    instrumentVersion: String(scores.instrumentVersion || "2.1"),
+    instrumentVersion: String(scores.instrumentVersion || "3.0"),
     // Source + image attribution for the article footer.
     imageCredit,
     imageRightsRestricted: rightsRestricted,
@@ -117,7 +117,7 @@ async function ensureVerificationColumns(): Promise<void> {
   } catch { /* best effort; publish still works, the app defaults missing status to verified */ }
 }
 
-// D1-4LS v2.1 metadata columns on the news record. Added on first publish so the
+// D1-4LS v3.0 metadata columns on the news record. Added on first publish so the
 // app/site can show the written interpretation, per-index notes, and the
 // instrument version a story was scored under (never silently reinterpreted).
 let scoreMetaColsReady = false;

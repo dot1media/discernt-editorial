@@ -32,7 +32,7 @@ export default function LivePage() {
   if (!s) return <Shell title="Go Live"><span className="mono muted tiny">Loading…</span></Shell>;
 
   return (
-    <Shell title="Go Live" subtitle="Stream the broadcast to news.dot1.media and the app.">
+    <Shell title="Go Live" subtitle="Stream the broadcast to discernt.dot1.media and the app.">
       {msg && <div className="tiny" style={{ marginBottom: 12, color: msg.includes("fail") || msg.includes("Could") || msg.includes("isn't") ? "#ffb4b4" : "#8fd6a8" }}>{msg}</div>}
 
       {/* Status banner */}

@@ -25,7 +25,7 @@ export type Capability =
   // Editorial review + publishing
   | "review.complete"
   | "review.approve" // editor approval step
-  | "publish.toNews" // push to news.dot1.media
+  | "publish.toNews" // push to discernt.dot1.media
   | "publish.override" // bypass incomplete review with a logged reason
   | "corrections.manage"
   // Media
@@ -143,7 +143,7 @@ export const CAPABILITY_GROUPS: { label: string; caps: { id: Capability; label: 
     caps: [
       { id: "review.complete", label: "Complete review checklist" },
       { id: "review.approve", label: "Editor approve" },
-      { id: "publish.toNews", label: "Publish to news.dot1.media" },
+      { id: "publish.toNews", label: "Publish to discernt.dot1.media" },
       { id: "publish.override", label: "Override incomplete review" },
       { id: "corrections.manage", label: "Manage corrections" },
     ],

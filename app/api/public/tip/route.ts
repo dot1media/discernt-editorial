@@ -7,7 +7,7 @@ import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
-// Public tip submission that other Dot One sites (news.dot1.media, dot1.media) can POST to from the
+// Public tip submission that other Dot One sites (discernt.dot1.media, dot1.media) can POST to from the
 // browser. CORS is scoped to Dot One origins. Two cheap spam guards: a honeypot field that real
 // users never fill, and a per-IP rate limit so a bot cannot flood the newsroom. Successful tips
 // land in the same tips table the newsroom triages, identical to the portal's own submit form.

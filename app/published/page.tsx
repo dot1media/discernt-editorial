@@ -83,7 +83,7 @@ export default function PublishedPage() {
     }
   }
 
-  const videoShareUrl = (id: string) => `https://news.dot1.media/v/${encodeURIComponent(id)}`;
+  const videoShareUrl = (id: string) => `https://discernt.dot1.media/v/${encodeURIComponent(id)}`;
   async function copyShare(id: string) {
     try { await navigator.clipboard.writeText(videoShareUrl(id)); } catch { /* ignore */ }
     setCopiedId(id); setTimeout(() => setCopiedId((c) => (c === id ? "" : c)), 1800);

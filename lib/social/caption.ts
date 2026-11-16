@@ -5,7 +5,7 @@
  * draft that an editor reviews and can edit before anything posts.
  */
 
-const NEWS_BASE = process.env.NEWS_PUBLIC_BASE || "https://news.dot1.media";
+const NEWS_BASE = process.env.NEWS_PUBLIC_BASE || "https://discernt.dot1.media";
 
 export interface CaptionStory {
   newsStoryId: string;
@@ -64,7 +64,7 @@ export function buildCaptions(story: CaptionStory): Captions {
   const instagram = [
     body,
     "",
-    "Read the full story at news.dot1.media. Link in bio.",
+    "Read the full story at discernt.dot1.media. Link in bio.",
     "",
     brand,
     "",

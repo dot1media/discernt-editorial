@@ -5,7 +5,7 @@
 const ALLOWED_ORIGINS = new Set<string>([
   "https://dot1.media",
   "https://www.dot1.media",
-  "https://news.dot1.media",
+  "https://discernt.dot1.media",
   "https://editorial.dot1.media",
 ]);
 

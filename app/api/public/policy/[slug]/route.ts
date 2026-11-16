@@ -7,10 +7,10 @@ import { CORE_STANDARDS, CLASSIFICATIONS } from "@/lib/newsroom";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Public, read-only policy content. This exists so the reader-facing site (news.dot1.media) can
+// Public, read-only policy content. This exists so the reader-facing site (discernt.dot1.media) can
 // render the standards, corrections, ownership, advertising, and contact pages under its OWN domain
 // while the editorial newsroom stays the single source of truth. The public never visits the
-// editorial domain; the news backend fetches this server-side and renders it as news.dot1.media.
+// editorial domain; the news backend fetches this server-side and renders it as discernt.dot1.media.
 // Read-only and non-sensitive, so it is open (GET) with permissive CORS.
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" };

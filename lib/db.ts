@@ -42,7 +42,7 @@ function newsConn(): NeonQueryFunction<false, false> | null {
   return _news;
 }
 
-// The news database (news.dot1.media) is a SEPARATE system we publish into. Optional at boot so the
+// The news database (discernt.dot1.media) is a SEPARATE system we publish into. Optional at boot so the
 // portal still runs for editorial work if publishing is not configured yet. Publish paths call
 // newsConfigured()/assertNewsConfigured() before using newsSql.
 export const newsSql: NeonQueryFunction<false, false> = ((...args: any[]) => {
@@ -58,7 +58,7 @@ export function newsConfigured(): boolean {
 export function assertNewsConfigured(): void {
   if (!newsConfigured()) {
     throw new Error(
-      "NEWS_DATABASE_URL is not set. Publishing to news.dot1.media needs the news database " +
+      "NEWS_DATABASE_URL is not set. Publishing to discernt.dot1.media needs the news database " +
         "pooled connection string. Add it in Vercel and redeploy."
     );
   }

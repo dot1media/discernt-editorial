@@ -9,7 +9,7 @@ import { publishToNews, unpublishFromNews } from "@/lib/publish";
 
 export const runtime = "nodejs";
 
-// Publish a story to news.dot1.media. This is the guarded bridge between the two databases.
+// Publish a story to discernt.dot1.media. This is the guarded bridge between the two databases.
 // A story may only publish when its review state is ready_to_publish (complete checklist AND
 // editor approval), UNLESS someone with publish.override supplies an explicit reason, which is
 // recorded in the audit log. Re-publishing an already-published story updates the same news row.

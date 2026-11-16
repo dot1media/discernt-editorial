@@ -65,7 +65,7 @@ export default function RightRail({ data, reload, can }: { data: any; reload: ()
           <div className="mini" style={{ marginBottom: 10 }}>PUBLISH</div>
           {isPublished ? (
             <>
-              <div className="tiny" style={{ color: "#8fd6a8", marginBottom: 10 }}>Live on news.dot1.media</div>
+              <div className="tiny" style={{ color: "#8fd6a8", marginBottom: 10 }}>Live on discernt.dot1.media</div>
               <button className="btn primary" style={{ width: "100%", justifyContent: "center" }} onClick={() => setPubOpen(true)}>
                 <Upload size={14} /> Re-sync to news
               </button>
@@ -242,7 +242,7 @@ function PublishModal({ story, ready, canOverride, onClose, onDone }: { story: a
     <div className="overlay" onClick={onClose}>
       <div className="modal card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
         <div className="pad">
-          <div className="disp" style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>Publish to news.dot1.media</div>
+          <div className="disp" style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>Publish to discernt.dot1.media</div>
           <div className="tiny muted" style={{ marginBottom: 16, lineHeight: 1.5 }}>
             This writes the story into the news database. Readers see it in the app and on the site.
           </div>

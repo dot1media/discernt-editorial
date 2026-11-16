@@ -71,7 +71,7 @@ export default function LensReelPage() {
           {items.map((m) => {
             const thumb = tab === "reel" ? m.thumbnail : m.image;
             const label = tab === "reel" ? (m.title || "Untitled") : (m.caption || "Untitled");
-            const open = tab === "reel" ? (m.id ? `https://news.dot1.media/v/${encodeURIComponent(m.id)}` : "") : m.image;
+            const open = tab === "reel" ? (m.id ? `https://discernt.dot1.media/v/${encodeURIComponent(m.id)}` : "") : m.image;
             return (
               <div key={m.id} className="card" style={{ overflow: "hidden" }}>
                 <div style={{ aspectRatio: "16/10", background: "#0002", overflow: "hidden" }}>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Form } from "@/components/PublicForm";
 
 // The public Submit a News Tip form. Posts to the same-origin public endpoint here on editorial;
-// the cross-origin version of this form (embedded on news.dot1.media and dot1.media) posts to the
+// the cross-origin version of this form (embedded on discernt.dot1.media and dot1.media) posts to the
 // same endpoint with CORS. Includes the honeypot field the endpoint checks.
 
 export default function TipFormPage() {

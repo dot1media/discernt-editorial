@@ -12,10 +12,12 @@
 
 export const EDITORIAL_THESIS = {
   mission:
-    'Discernt helps followers of Jesus engage current events with discernment, ' +
-    'clarity, and hope. We report what is true, weigh it through a biblical lens, ' +
-    'and refuse the outrage economy. Our credibility rests on measured, verifiable ' +
-    'reporting that treats every person with dignity.',
+    'Discernt brings followers of Jesus true stories of God at work in the world — ' +
+    'faith and hope, redemption in Christ, answered prayer, miracles reported with ' +
+    'care, and the gospel advancing among every people and language. We report what ' +
+    'is true, weigh it with discernment, and refuse hype and the outrage economy. ' +
+    'Our credibility rests on measured, verifiable reporting that treats every ' +
+    'person with dignity and gives glory to Christ, not to platforms.',
 
   voice:
     'Measured, calm, intellectually honest, and pastorally warm. Never sensational, ' +
@@ -34,9 +36,11 @@ export const EDITORIAL_THESIS = {
 
   // Stories that ADVANCE the thesis (favor these).
   favored:
-    'faith and the church, human dignity and justice, the vulnerable and overlooked, ' +
-    'moral and ethical questions, science and creation, cultural and family life, ' +
-    'perseverance and hope, and consequential world events told with restraint.',
+    'the gospel advancing and the church growing, revival and awakening, redemption ' +
+    'and lives transformed in Christ, answered prayer, miracles and healings told ' +
+    'with sober verification, the courage and endurance of the persecuted church, ' +
+    'works of mercy and justice done in Jesus name, and faith among every people ' +
+    'and language.',
 
   // Framing DISCOURAGED — these are the "jarring headlines" to avoid amplifying.
   discouraged:

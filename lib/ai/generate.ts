@@ -53,7 +53,7 @@ export interface GeneratedArticle {
   totals: IndexTotals;
   scoreConfidence: ScoreConfidence;
   scoringNotes: string;
-  interpretation: string; // D1-4LS v2.1: bounded, reader-facing profile interpretation
+  interpretation: string; // D1-4LS v3.0: bounded, reader-facing profile interpretation
   indexNotes: { BAI: string; PSI: string; SCI: string; HII: string };
   // Verifiable factual claims extracted from the brief, seeded into the story's
   // verification checklist as "unconfirmed" for the editor to confirm.
@@ -282,35 +282,35 @@ OUTPUT, ONLY a JSON object, no fences, no preamble:
 
 function buildScorerPrompt(members: SourceMember[], draft: WriterOutput): string {
   const primary = members[0];
-  return `You are the independent D1-4LS assessor for "Discernt". You did NOT write the brief below — assess it skeptically. Eloquence is not evidence: score the story AS SOURCED, and penalize gaps the writing papers over.
+  return `You are the independent D1-4LS v3.0 assessor for "Discernt". You did NOT write the brief below — assess it with discernment. Eloquence is not evidence: score the story AS SOURCED, and do not reward spectacle or unverified claims.
 
-D1-4LS v2.1 INTERPRETATION PRINCIPLES (govern your scoring AND your written interpretation):
-- The four lenses measure DIFFERENT things and must stay separate. A high BAI never implies the facts are verified; a low PSI never implies weak journalism; SCI (sourcing) is independent of theological alignment.
-- The composite total is a secondary summary only. Never treat it as a probability, a percentage of truth, or an overall quality grade. The ordered profile (BAI, PSI, SCI, HII) is the primary result.
-- Restraint: PSI rewards documented thematic relevance held with humility, never prophetic fulfillment, certainty, or date-setting.
-- Non-endorsement: a high score never endorses the people, actions, or institutions in the story. Reporting accurately on an unethical act does not make the report unethical.
-- Separation: keep theological interpretation distinct from factual verification; distinguish a story's SUBJECT from its editorial TREATMENT.
+D1-4LS v3.0 INTERPRETATION PRINCIPLES (govern your scoring AND your written interpretation):
+- The four lenses measure DIFFERENT things and must stay separate. A high Scriptural Grounding never implies the facts are verified; a low Kingdom Significance never implies weak journalism; Source Credibility (sourcing) is independent of scriptural or kingdom weight.
+- The composite total is a secondary summary only. Never treat it as a probability, a percentage of truth, or an overall quality grade. The ordered profile (Scriptural Grounding, Kingdom Significance, Source Credibility, Fruit & Edification) is the primary result.
+- Restraint: Kingdom Significance rewards a documented, real move of God held with humility, never prophetic fulfillment, certainty, or date-setting.
+- Non-endorsement: a high score never endorses the people, ministries, or institutions in the story. Reporting accurately on a failing does not make the report unfaithful.
+- Separation: keep scriptural and kingdom interpretation distinct from factual verification; distinguish a story's SUBJECT from its editorial TREATMENT.
 
 ORIGINAL SOURCE REPORTING (${members.length} outlet${members.length > 1 ? 's' : ''} on this event):
 ${members.map((m, i) => `[${i + 1}] ${m.source.name}: ${m.item.title}`).join('\n')}
-${members.length > 1 ? 'Independent corroboration counts for SCI: when several outlets report the same facts, sciVerification should reflect that; when a claim rests on only one, it should not.' : ''}
+${members.length > 1 ? 'Independent corroboration counts for Source Credibility: when several outlets report the same facts, sciVerification should reflect that; when a claim rests on only one, it should not.' : ''}
 
 THE BRIEF UNDER ASSESSMENT:
 ${draft.body}
 
-CALIBRATION ANCHORS (every indicator): 0 = absent or contrary · 1 = partial, mixed, or the normal state of neutral secular reporting · 2 = explicitly and clearly present. Most honest secular news earns 1s on worldview indicators — that is correct calibration, not failure.
+CALIBRATION ANCHORS (every indicator): 0 = absent or contrary · 1 = partial or mixed · 2 = clearly and substantively present. Be honest: a genuine work of God, soberly reported with real witnesses, should score well; a thin or unverifiable claim should not.
 
-PARITY CLAUSE: identical conduct must receive identical scores regardless of which political, national, or religious actor performed it. If your rationale for a score would change were the actors swapped, revise the score until it would not.
+PARITY CLAUSE: identical substance must receive identical scores regardless of the person, tradition, nation, or ministry involved. If swapping the actors would change your score, revise it until it would not.
 
-Score these 17 article-level indicators. For EACH, write the rationale FIRST, then the score — reasoning before numbers.
-BAI (worldview coherence): baiScripturalConsistency, baiDoctrinalIntegrity, baiMoralFramework, baiAnthropology, baiTeleology.
-PSI (prophetic relevance WITH restraint — reward theological humility, penalize speculation presented as certainty): psiTextualLinkage, psiEschatologicalFit, psiHistoricalContinuity, psiSpiritualImpact, psiTheologicalRestraint. Low PSI on ordinary news is correct.
-SCI (score ONLY these two; outlet-level indicators are system-set): sciPrimarySourceAccess (2 = item contains primary documents/firsthand data · 1 = secondary reporting · 0 = anonymous/circular), sciVerification (2 = independently corroborated within the item · 1 = partial · 0 = unverified claims).
-HII (human consequence): hiiHumanDignity, hiiCompassionEmpathy, hiiSocietalImpact, hiiJusticeResponsibility, hiiChristModeledCare.
+Score these 17 article-level indicators across the four discernment lenses. For EACH, write the rationale FIRST, then the score — reasoning before numbers.
+SCRIPTURAL GROUNDING (illuminated by Scripture and sound): baiScripturalConsistency (aligns with clear biblical teaching), baiDoctrinalIntegrity (consistent with the historic Christian faith), baiMoralFramework (Christ-centered, points to Jesus not spectacle), baiAnthropology (image-bearer dignity), baiTeleology (redemptive hope and purpose).
+KINGDOM SIGNIFICANCE (is God visibly at work?): psiTextualLinkage (gospel advance), psiEschatologicalFit (a move of God: revival, awakening, the church growing or enduring), psiHistoricalContinuity (redemption and transformation, lives changed), psiSpiritualImpact (answered prayer), psiTheologicalRestraint (sober and watchful, NO date-setting or sensational certainty).
+SOURCE CREDIBILITY (score ONLY these two; outlet-level indicators are system-set): sciPrimarySourceAccess (2 = firsthand accounts, named witnesses, or primary documents · 1 = secondary reporting · 0 = anonymous/circular), sciVerification (2 = independently corroborated, especially for any healing or miracle claim · 1 = partial · 0 = unverified).
+FRUIT & EDIFICATION (does it build up and give glory to Christ?): hiiHumanDignity (faith encouragement), hiiCompassionEmpathy (compassion and mercy), hiiSocietalImpact (fruit of the Spirit: reconciliation, peace, love), hiiJusticeResponsibility (justice and righteousness), hiiChristModeledCare (glory to God, not to people or platforms).
 
 ALSO produce:
-- "indexNotes": ONE plain-English sentence per index, written for ordinary readers, explaining what drove that lens's result for THIS story (no jargon, no indicator names).
-- "interpretation": a bounded, reader-facing interpretation of the WHOLE profile, 2 to 4 sentences, following this template: (1) name the profile's most distinctive supported features and which lenses they come from; (2) state the most important sourcing strength or limitation using SCI; (3) clarify any theological, prophetic, or human-impact boundary a reader might misread (for example that low PSI is not weak journalism, or a high score is not an endorsement). Every clause must trace to a rationale above. Make NO claim of factual certainty, prophetic fulfillment, endorsement, or overall quality from the total. No em-dashes, no markdown.
+- "indexNotes": ONE plain-English sentence per lens, written for ordinary readers, explaining what drove that lens for THIS story (no jargon, no indicator names). Keys map as: BAI = Scriptural Grounding, PSI = Kingdom Significance, SCI = Source Credibility, HII = Fruit & Edification.
+- "interpretation": a bounded, reader-facing interpretation of the WHOLE profile, 2 to 4 sentences, following this template: (1) name the profile's most distinctive supported features and which lenses they come from; (2) state the most important sourcing strength or limitation using Source Credibility; (3) clarify any boundary a reader might misread (for example that low Kingdom Significance is not weak journalism, or a high score is not an endorsement). Every clause must trace to a rationale above. Make NO claim of factual certainty, a settled move of God, endorsement, or overall quality from the total. No em-dashes, no markdown.
 - "confidence": "low" if the source summary is under ~40 words or claims are uncorroborated; "moderate" for typical single-outlet reporting; "high" only when the item itself contains primary/corroborated material.
 - "claims": the 3 to 6 most important FACTUAL assertions the brief makes that an editor must verify before publication (names, numbers, dates, events, direct quotes, causal or attributive claims). Quote or closely paraphrase each from the brief; do NOT invent any claim that is not in the brief. For each, set "source" to the outlet the brief attributes it to (default "${primary.source.name}"). If the brief makes no checkable factual claims, return an empty array.
 

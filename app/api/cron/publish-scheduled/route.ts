@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     const state = await recomputeReviewState(story.id);
     if (state !== "ready_to_publish") { waiting.push({ id: story.id, reviewState: state }); continue; }
     try {
-      const authorLabel = story.final_headline ? story.author_name || "Dot 1 Newsroom" : "Dot 1 Newsroom";
+      const authorLabel = story.final_headline ? story.author_name || "Discerntroom" : "Discerntroom";
       const { newsStoryId, totalScore } = await publishToNews(story, authorLabel);
       await sql`UPDATE stories SET status = 'published', news_story_id = ${newsStoryId}, published_at = COALESCE(published_at, now()), updated_at = now() WHERE id = ${story.id}`;
       await audit("system@scheduler", "publish.scheduled", "story", story.id, { newsStoryId, totalScore, plannedPublishAt: story.planned_publish_at });

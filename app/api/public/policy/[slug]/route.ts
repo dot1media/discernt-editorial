@@ -18,7 +18,7 @@ const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods
 const SLUG_MAP: Record<string, { canonical: string; lead: string }> = {
   standards: {
     canonical: "editorial-standards",
-    lead: "These are the standards that govern Dot 1 News journalism. We do not claim a view from nowhere. We tell you where we stand, and we hold our reporting to the disciplines below.",
+    lead: "These are the standards that govern Discernt journalism. We do not claim a view from nowhere. We tell you where we stand, and we hold our reporting to the disciplines below.",
   },
   corrections: {
     canonical: "corrections",

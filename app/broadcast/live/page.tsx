@@ -9,7 +9,7 @@ export default function LivePage() {
   const { can } = useMe();
   const mayGoLive = can("broadcast.golive");
   const [s, setS] = useState<any>(null);
-  const [title, setTitle] = useState("Dot 1 News Live");
+  const [title, setTitle] = useState("Discernt Live");
   const [showKey, setShowKey] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
@@ -87,7 +87,7 @@ export default function LivePage() {
       {mayGoLive && s.provisioned && (
         <div className="card pad" style={{ marginBottom: 16 }}>
           <label className="f">Broadcast title (shown to viewers)</label>
-          <input className="in" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Dot 1 News Live" />
+          <input className="in" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Discernt Live" />
         </div>
       )}
 

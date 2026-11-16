@@ -52,12 +52,12 @@ function prepare(story: EditorialStoryRow) {
   const summary = (story.summary || "").trim() || headline;
   const content = (story.body || "").trim() || summary;
   // Copyright protection: when an editor marks the source image rights-restricted,
-  // publish a branded, resizable placeholder instead and credit it to Dot 1 News.
+  // publish a branded, resizable placeholder instead and credit it to Discernt.
   // Otherwise keep the source image and carry its credit to the article footer.
   const rightsRestricted = !!story.hero_image_rights_restricted;
   const sourceImage = (story.hero_image || "").trim() || "https://news.dot1.media/placeholder.jpg";
   const image = rightsRestricted ? BRAND_FALLBACK_IMAGE : sourceImage;
-  const imageCredit = rightsRestricted ? "Dot 1 News" : String(story.hero_image_credit || "").trim();
+  const imageCredit = rightsRestricted ? "Discernt" : String(story.hero_image_credit || "").trim();
   const ind = normalizeIndicators(story.scores?.indicators || {});
   const totals = computeIndexTotals(ind);
   const wc = wordCount(content);
@@ -260,7 +260,7 @@ export async function publishSourcedPhoto(p: SourcedPhotoInput): Promise<{ newsI
   await db`INSERT INTO photos (id, image, caption, full_description, location, photographer, credit_url,
       image_format, photo_style, category, image_width, image_height, status, date, published_at)
     VALUES (${newsId}, ${p.image}, ${(p.caption || "Untitled").slice(0, 500)}, ${p.description || ""},
-      ${p.location || "Unknown"}, ${(p.photographer || "Dot 1 News").slice(0, 200)}, ${p.creditUrl || ""},
+      ${p.location || "Unknown"}, ${(p.photographer || "Discernt").slice(0, 200)}, ${p.creditUrl || ""},
       ${imageFormatFromUrl(p.image)}, ${p.style || "documentary"}, ${p.category || null},
       ${p.width ?? null}, ${p.height ?? null}, 'published', ${now}, ${now})`;
   return { newsId };
@@ -286,7 +286,7 @@ export async function publishSourcedVideo(v: SourcedVideoInput): Promise<{ newsI
     VALUES (${newsId}, ${(v.title || "Untitled").slice(0, 300)}, ${v.description || v.title || ""},
       ${v.thumbnail || ""}, ${v.videoUrl}, ${duration}, ${secs},
       ${vFormat}, ${v.category || "news-report"}, ${v.style || "documentary"},
-      ${(v.producer || "Dot 1 News").slice(0, 200)}, ${v.creditUrl || ""}, 'published', ${now}, ${now})`;
+      ${(v.producer || "Discernt").slice(0, 200)}, ${v.creditUrl || ""}, 'published', ${now}, ${now})`;
   return { newsId };
 }
 
@@ -338,7 +338,7 @@ export async function publishMediaToNews(m: MediaRow, credit: string): Promise<{
     const imgFormat = m.mime.includes("png") ? "png" : m.mime.includes("webp") ? "webp" : "jpeg";
     const caption = (m.caption || m.title || "Untitled").slice(0, 500);
     const location = m.location || "Unknown";
-    const photographer = credit || m.credit || "Dot 1 News";
+    const photographer = credit || m.credit || "Discernt";
     const category = m.category || null; // photos.category is nullable
     const style = m.media_style || "documentary";
     if (isUpdate) {

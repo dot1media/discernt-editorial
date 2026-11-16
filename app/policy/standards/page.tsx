@@ -11,7 +11,7 @@ export default async function StandardsPublicPage() {
       <PageTitle>{page?.title || "Editorial Standards"}</PageTitle>
 
       <p style={{ fontFamily: "Archivo, sans-serif", fontSize: 16, lineHeight: 1.7, marginBottom: 28 }}>
-        These are the standards that govern Dot 1 News journalism. We do not claim a view from
+        These are the standards that govern Discernt journalism. We do not claim a view from
         nowhere. We tell you where we stand, and we hold our reporting to the disciplines below.
       </p>
 

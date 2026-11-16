@@ -16,7 +16,7 @@ export async function GET() {
   const existing = await sql`SELECT COUNT(*)::int AS n FROM show_templates`;
   if ((existing[0]?.n || 0) === 0) {
     await sql`INSERT INTO show_templates (id, name, description, default_weekday, default_time, target_runtime_seconds, segments, weather_location, weather_lat, weather_lng, created_by)
-      VALUES (${newId("tpl")}, ${"Evening Edition"}, ${"The nightly Dot 1 News broadcast."}, ${4}, ${"18:00"}, ${1800},
+      VALUES (${newId("tpl")}, ${"Evening Edition"}, ${"The nightly Discernt broadcast."}, ${4}, ${"18:00"}, ${1800},
         ${JSON.stringify(DEFAULT_TEMPLATE_SEGMENTS)}, ${"Wasilla, AK"}, ${61.5814}, ${-149.4394}, ${"system"})`;
   }
   const rows = await sql`SELECT * FROM show_templates ORDER BY name`;

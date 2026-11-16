@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const existing = await getLiveConfig();
     if (existing?.live_input_id) return NextResponse.json({ ok: true, alreadyProvisioned: true });
     let input;
-    try { input = await cfCreateLiveInput("Dot 1 News live"); }
+    try { input = await cfCreateLiveInput("Discernt live"); }
     catch (e: any) { return NextResponse.json({ error: e.message || "Could not create the live input." }, { status: 502 }); }
     const urls = playbackUrls(input.uid);
     await sql`UPDATE live_config SET live_input_id = ${input.uid}, rtmps_url = ${input.rtmpsUrl},
@@ -62,11 +62,11 @@ export async function POST(request: Request) {
     if (!newsConfigured()) return NextResponse.json({ error: "News database isn't configured." }, { status: 503 });
     const cfg = await getLiveConfig();
     if (!cfg?.live_input_id) return NextResponse.json({ error: "Set up the live input first." }, { status: 400 });
-    await newsSql`UPDATE live_state SET is_live = true, title = ${(title || "Dot 1 News Live").slice(0, 200)},
+    await newsSql`UPDATE live_state SET is_live = true, title = ${(title || "Discernt Live").slice(0, 200)},
       hls_url = ${cfg.hls_url}, player_url = ${cfg.player_url}, started_at = now(), updated_at = now() WHERE id = 'current'`;
     await audit(account.email, "live.golive", "live_state", "current", { title });
     // Notify readers we're on air (best-effort; don't block going live)
-    sendPushToAll("Dot 1 News is live", (title || "We're on air now. Tap to watch."), { type: "live" }).catch(() => {});
+    sendPushToAll("Discernt is live", (title || "We're on air now. Tap to watch."), { type: "live" }).catch(() => {});
     return NextResponse.json({ ok: true, isLive: true });
   }
 

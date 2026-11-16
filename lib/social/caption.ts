@@ -1,5 +1,5 @@
 /**
- * Caption writer for Dot 1 News social posts. Measured, calm brand voice, no
+ * Caption writer for Discernt social posts. Measured, calm brand voice, no
  * em-dashes, with a clear source line and the handle. Facebook gets the inline
  * article link; Instagram points to the link in bio. Captions are a starting
  * draft that an editor reviews and can edit before anything posts.

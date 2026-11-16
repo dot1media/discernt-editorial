@@ -233,7 +233,7 @@ function buildWriterPrompt(members: SourceMember[]): string {
     .join('\n');
   const otherOutlets = members.slice(1).map((m) => m.source.name).join(', ');
 
-  return `You are the staff writer for "Dot 1 News", a Christian news platform whose credibility rests on measured, verifiable reporting. You write the brief ONLY. A separate assessor will score it.
+  return `You are the staff writer for "Discernt", a Christian news platform whose credibility rests on measured, verifiable reporting. You write the brief ONLY. A separate assessor will score it.
 
 EDITORIAL THESIS (governs everything you write): ${EDITORIAL_THESIS.mission}
 YOUR VOICE: ${EDITORIAL_THESIS.voice}
@@ -282,7 +282,7 @@ OUTPUT, ONLY a JSON object, no fences, no preamble:
 
 function buildScorerPrompt(members: SourceMember[], draft: WriterOutput): string {
   const primary = members[0];
-  return `You are the independent D1-4LS assessor for "Dot 1 News". You did NOT write the brief below — assess it skeptically. Eloquence is not evidence: score the story AS SOURCED, and penalize gaps the writing papers over.
+  return `You are the independent D1-4LS assessor for "Discernt". You did NOT write the brief below — assess it skeptically. Eloquence is not evidence: score the story AS SOURCED, and penalize gaps the writing papers over.
 
 D1-4LS v2.1 INTERPRETATION PRINCIPLES (govern your scoring AND your written interpretation):
 - The four lenses measure DIFFERENT things and must stay separate. A high BAI never implies the facts are verified; a low PSI never implies weak journalism; SCI (sourcing) is independent of theological alignment.

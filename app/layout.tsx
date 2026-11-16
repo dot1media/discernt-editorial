@@ -5,8 +5,8 @@ import PWA from "@/components/PWA";
 export const viewport = { width: "device-width", initialScale: 1, themeColor: "#141210" };
 
 export const metadata: Metadata = {
-  title: "Dot 1 News · Editorial",
-  description: "The Dot 1 News editorial portal: standards, newsroom workflow, and publishing.",
+  title: "Discernt · Editorial",
+  description: "The Discernt editorial portal: standards, newsroom workflow, and publishing.",
   robots: { index: false, follow: false },
   manifest: "/manifest.webmanifest",
   icons: {

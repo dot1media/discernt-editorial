@@ -13,7 +13,7 @@ export default function DigestPage() {
   const [from, setFrom] = useState(() => iso(new Date(Date.now() - 7 * 86400000)));
   const [to, setTo] = useState(() => iso(new Date()));
   const [picked, setPicked] = useState<Set<string>>(new Set());
-  const [title, setTitle] = useState("This week from Dot 1 News");
+  const [title, setTitle] = useState("This week from Discernt");
   const [intro, setIntro] = useState("");
   const [copied, setCopied] = useState("");
   useEffect(() => { api<{ stories: any[] }>("/api/stories?status=published").then((d) => setAll(d.stories || [])).catch(() => {}); }, []);
@@ -30,7 +30,7 @@ export default function DigestPage() {
       </td></tr>`).join("");
     return `<!doctype html><html><body style="margin:0;background:#f4f0e7;padding:24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fbf8f2;border-radius:12px;padding:28px 24px">
-  <tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#6f6d65">Dot 1 News &middot; ${esc(from)} to ${esc(to)}</td></tr>
+  <tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#6f6d65">Discernt &middot; ${esc(from)} to ${esc(to)}</td></tr>
   <tr><td style="font-family:Georgia,'Bodoni Moda',serif;font-size:28px;font-weight:700;color:#141210;padding:6px 0 4px">${esc(title)}</td></tr>
   ${intro ? `<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#33322d;line-height:1.6;padding:6px 0 10px">${esc(intro).replace(/\n/g, "<br/>")}</td></tr>` : ""}
   ${items}

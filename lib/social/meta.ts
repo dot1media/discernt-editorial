@@ -1,9 +1,9 @@
 /**
- * Meta Graph API: publish a Dot 1 News post card + caption to the Dot 1 News
+ * Meta Graph API: publish a Discernt post card + caption to the Discernt
  * Facebook Page and the connected Instagram Business account.
  *
  * Auth: a non-expiring System User token (META_PAGE_TOKEN) assigned to the
- * Dot 1 News Page and Instagram account, with pages_manage_posts,
+ * Discernt Page and Instagram account, with pages_manage_posts,
  * instagram_basic, and instagram_content_publish. We exchange it for the
  * Page access token and use that for both Facebook and Instagram, which is the
  * pattern Meta expects for a Page-connected IG account.
@@ -94,7 +94,7 @@ async function pageAccessToken(): Promise<string> {
   return tok;
 }
 
-/** Post a photo with a caption to the Dot 1 News Facebook Page. Returns the post id. */
+/** Post a photo with a caption to the Discernt Facebook Page. Returns the post id. */
 export async function postToFacebook(imageUrl: string, caption: string): Promise<string> {
   const tok = await pageAccessToken();
   const r = await graphPost(`${META.pageId}/photos`, { url: imageUrl, caption, published: "true" }, tok);

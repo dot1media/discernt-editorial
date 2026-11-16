@@ -85,6 +85,16 @@ export default function AiDeskPage() {
     finally { setYtBusy(false); }
   }
 
+  async function purgeAll() {
+    const ok = window.prompt("This deletes ALL stories and takes every published article down from the app and website. It cannot be undone.\n\nType DELETE ALL to confirm.");
+    if (ok !== "DELETE ALL") return;
+    try {
+      const r = await api<{ editorial: number; published: number }>("/api/stories/purge", { method: "POST" });
+      alert(`Cleared ${r.editorial} editorial and ${r.published} published. The newsroom is fresh.`);
+      await load();
+    } catch (e: any) { setErr(e?.message || "Purge failed."); }
+  }
+
   return (
     <Shell title="AI Desk" subtitle="Generate drafts from the wire. Each lands as a story to verify, rate, and publish."
       actions={can("story.create") ? (
@@ -99,6 +109,9 @@ export default function AiDeskPage() {
           <button className="btn primary" onClick={generate} disabled={running}>
             {running ? <><RefreshCw size={15} className="spin" /> Generating…</> : <><Sparkles size={15} /> Generate now</>}
           </button>
+          {can("story.delete") && (
+            <button className="btn ghost" style={{ color: "#e88" }} onClick={purgeAll} title="Delete all stories and start fresh">Clear all</button>
+          )}
         </div>
       ) : undefined}>
 

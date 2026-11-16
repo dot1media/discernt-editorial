@@ -22,6 +22,17 @@ export async function ensureDisplayOrderColumn() {
   } catch { /* best effort; listArticles falls back to date order */ }
 }
 
+// Delete EVERY published article from the news database. The app and the news
+// site read news_stories, so this clears all articles from both. Used by the
+// start-fresh purge; returns how many were removed.
+export async function purgeAllArticles(): Promise<number> {
+  assertNews();
+  const rows = (await newsSql`SELECT COUNT(*)::int AS c FROM news_stories`) as any[];
+  const count = rows[0]?.c || 0;
+  await newsSql`DELETE FROM news_stories`;
+  return count;
+}
+
 export async function listArticles({ q = "", limit = 60, offset = 0 }: { q?: string; limit?: number; offset?: number }) {
   assertNews();
   const like = `%${q}%`;

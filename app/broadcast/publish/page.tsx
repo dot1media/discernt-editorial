@@ -15,7 +15,7 @@ export default function PublishEpisodePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<string>(CATEGORIES[0]);
-  const [producer, setProducer] = useState("Dot 1 News");
+  const [producer, setProducer] = useState("Discernt");
   const [file, setFile] = useState<File | null>(null);
   const [stage, setStage] = useState<Stage>("form");
   const [pct, setPct] = useState(0);

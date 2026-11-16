@@ -63,7 +63,7 @@ export default function LoginPage() {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div className="card pad" style={{ width: "100%", maxWidth: 420 }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div className="disp" style={{ fontSize: 28, fontWeight: 700 }}>Dot 1 News</div>
+          <div className="disp" style={{ fontSize: 28, fontWeight: 700 }}>Discernt</div>
           <div className="mono" style={{ fontSize: 9, letterSpacing: "0.24em", color: "var(--gold)", marginTop: 6 }}>
             EDITORIAL PORTAL
           </div>

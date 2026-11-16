@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const title = (b.title || "Untitled Episode").toString().slice(0, 200);
   const description = (b.description || "").toString().slice(0, 5000);
   const category = (b.category || "news").toString().slice(0, 40);
-  const producer = (b.producer || "Dot 1 News").toString().slice(0, 120);
+  const producer = (b.producer || "Discernt").toString().slice(0, 120);
   const publish = b.publish !== false; // default publish
 
   const hls = playbackUrls(uid).hls;

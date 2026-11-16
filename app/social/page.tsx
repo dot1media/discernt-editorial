@@ -125,7 +125,7 @@ export default function SocialPage() {
   }
 
   return (
-    <Shell title="Social · Make Dot 1 Seen" subtitle="Branded posts from published stories, reviewed before they reach Instagram, Facebook, and X">
+    <Shell title="Social · Make Discernt Seen" subtitle="Branded posts from published stories, reviewed before they reach Instagram, Facebook, and X">
       <div className="row-between" style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div className="tiny" style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
           <span style={{ color: metaOk ? "#4CAF7D" : "#E0544B" }}>

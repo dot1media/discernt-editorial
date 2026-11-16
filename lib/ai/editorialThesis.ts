@@ -1,18 +1,18 @@
 /**
- * EDITORIAL THESIS — the core identity that governs what Dot 1 News selects,
+ * EDITORIAL THESIS — the core identity that governs what Discernt selects,
  * how it frames stories, and what it refuses. This is the single source of
  * truth for the app's angle and voice, referenced by the writer prompt, the
  * story-selection gate, and the media matchers so that articles, reels, and
  * photojournalism all express one coherent editorial character.
  *
- * The thesis, in one line: Dot 1 News exists to help Christians engage the
+ * The thesis, in one line: Discernt exists to help Christians engage the
  * news with discernment and hope — measured reporting seen through a biblical
  * lens — NOT to chase outrage, fear, or sensation.
  */
 
 export const EDITORIAL_THESIS = {
   mission:
-    'Dot 1 News helps followers of Jesus engage current events with discernment, ' +
+    'Discernt helps followers of Jesus engage current events with discernment, ' +
     'clarity, and hope. We report what is true, weigh it through a biblical lens, ' +
     'and refuse the outrage economy. Our credibility rests on measured, verifiable ' +
     'reporting that treats every person with dignity.',

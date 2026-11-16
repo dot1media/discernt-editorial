@@ -40,7 +40,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   // If it is live, push the corrected content to the same news row.
   let resynced = false;
   if (story.news_story_id && newsConfigured()) {
-    await publishToNews(story as any, story.author_name || "Dot 1 Newsroom");
+    await publishToNews(story as any, story.author_name || "Discerntroom");
     resynced = true;
   }
 

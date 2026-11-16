@@ -47,7 +47,7 @@ export default function NotifyPage() {
           <div style={{ background: "#1c1a17", borderRadius: 14, padding: 12, display: "flex", gap: 10, alignItems: "flex-start" }}>
             <div style={{ width: 30, height: 30, borderRadius: 7, background: "#b81616", flex: "0 0 auto" }} />
             <div style={{ minWidth: 0 }}>
-              <div style={{ color: "#fff", fontWeight: 700, fontSize: 13 }}>{title || "Dot 1 News"}</div>
+              <div style={{ color: "#fff", fontWeight: 700, fontSize: 13 }}>{title || "Discernt"}</div>
               <div style={{ color: "#cfc8ba", fontSize: 12, marginTop: 2 }}>{body || "Your message appears here."}</div>
             </div>
           </div>

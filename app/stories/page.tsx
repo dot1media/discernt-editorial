@@ -32,6 +32,15 @@ function StoriesInner() {
     try { await api(`/api/stories/${id}`, { method: "DELETE" }); await load(); }
     catch (e: any) { alert(e?.message || "Delete failed."); }
   }
+  async function purgeAll() {
+    const ok = window.prompt("This deletes ALL stories and takes every published article down from the app and website. It cannot be undone.\n\nType DELETE ALL to confirm.");
+    if (ok !== "DELETE ALL") return;
+    try {
+      const r = await api<{ editorial: number; published: number }>(`/api/stories/purge`, { method: "POST" });
+      alert(`Cleared ${r.editorial} editorial stor${r.editorial === 1 ? "y" : "ies"} and ${r.published} published article${r.published === 1 ? "" : "s"}. The newsroom is fresh.`);
+      await load();
+    } catch (e: any) { alert(e?.message || "Purge failed."); }
+  }
   const [q, setQ] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -54,7 +63,12 @@ function StoriesInner() {
     <Shell
       title="Stories"
       subtitle="Every potential story is a record here."
-      actions={can("story.create") ? <button className="btn primary" onClick={() => setCreating(true)}><Plus size={15} /> New story</button> : undefined}
+      actions={
+        <div style={{ display: "flex", gap: 8 }}>
+          {can("story.delete") && <button className="btn ghost" style={{ color: "#e88" }} onClick={purgeAll}>Clear all stories</button>}
+          {can("story.create") && <button className="btn primary" onClick={() => setCreating(true)}><Plus size={15} /> New story</button>}
+        </div>
+      }
     >
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         <button className={"btn sm" + (!statusFilter ? " gold" : " ghost")} onClick={() => router.push("/stories")}>All</button>

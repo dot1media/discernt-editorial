@@ -51,7 +51,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     await audit(account.email, "publish.override", "story", id, { reviewState: state, reason });
   }
 
-  const authorLabel = story.final_headline ? story.author_name || "Dot 1 Newsroom" : "Dot 1 Newsroom";
+  const authorLabel = story.final_headline ? story.author_name || "Discerntroom" : "Discerntroom";
   const { newsStoryId, totalScore } = await publishToNews(story as any, authorLabel);
 
   await sql`UPDATE stories SET status = 'published', news_story_id = ${newsStoryId}, published_at = COALESCE(published_at, now()), updated_at = now() WHERE id = ${id}`;

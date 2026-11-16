@@ -9,7 +9,7 @@ import sharp from "sharp";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Public route: renders the branded Dot 1 News post card for a queued social
+// Public route: renders the branded Discernt post card for a queued social
 // post as a JPEG (Instagram requires JPEG). Three alternating styles keep the
 // grid varied: A (photo over a text panel), B (full-bleed photo, headline
 // overlaid), C (text-forward, photo band at the foot). The Graph API fetches a
@@ -133,7 +133,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "space-between", paddingLeft: pad, paddingRight: pad, paddingTop: 22, paddingBottom: 22, borderTop: `1px solid ${HAIR}`, backgroundColor: INK }}>
       <div style={{ display: "flex", alignItems: "center" }}>
         <img src={globeBone} width={Math.round((30 * 449) / 1024)} height={30} alt="" />
-        <span style={{ fontFamily: "Bodoni", fontWeight: 700, color: BONE, fontSize: 22, letterSpacing: 3, marginLeft: 10 }}>DOT 1 NEWS</span>
+        <span style={{ fontFamily: "Bodoni", fontWeight: 700, color: BONE, fontSize: 22, letterSpacing: 3, marginLeft: 10 }}>DISCERNT</span>
       </div>
       <span style={{ fontFamily: "Plex", fontWeight: 600, color: MUTED, fontSize: 15, letterSpacing: 1.5 }}>@{META.handle} · news.dot1.media</span>
     </div>
@@ -146,7 +146,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const VLine = (
     <div style={{ display: "flex", alignItems: "center" }}>
       <div style={{ width: 14, height: 14, borderRadius: 999, backgroundColor: vcol }} />
-      <span style={{ fontFamily: "Archivo", fontWeight: 600, color: MUTED, fontSize: 18, marginLeft: 10 }}>Dot 1 Newsroom</span>
+      <span style={{ fontFamily: "Archivo", fontWeight: 600, color: MUTED, fontSize: 18, marginLeft: 10 }}>Discerntroom</span>
     </div>
   );
 

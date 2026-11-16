@@ -225,7 +225,7 @@ const WALK_STEPS: WalkStep[] = [
   { tag: "Move it up", title: "Verify and climb the ladder", body: "The review status is computed from the actual work, not set by hand. Handle each verification claim and finish the checklist, and the story climbs the ladder on its own toward Ready to Publish.", art: <LadderDiagram /> },
   { tag: "Score it", title: "Dual-rate the D1-4LS score", body: "Four indices, five indicators each, 0 to 2, out of 40. On an AI story the AI scorer rates first; a person adds the second rating on the Score tab. Close raters average; if they diverge, a third breaks the tie.", art: <DualRateDiagram /> },
   { tag: "New", title: "Set the reader-facing status", body: "Before a story goes out, the editor sets the status readers see: Verified (the gold default), Pending verification, or Unverified. It shows as a colored dot in the app and on the website. Override lets you publish at a chosen status with a written reason.", art: <VerificationMock /> },
-  { tag: "New", title: "Make Dot 1 Seen", body: "From Social, generate branded cards from published stories in three alternating styles. Review the caption and pick Instagram, Facebook, or both, then approve and schedule, or post now. A background schedule fills open slots within active hours. Nothing posts until a person has approved it.", art: <SocialMock /> },
+  { tag: "New", title: "Make Discernt Seen", body: "From Social, generate branded cards from published stories in three alternating styles. Review the caption and pick Instagram, Facebook, or both, then approve and schedule, or post now. A background schedule fills open slots within active hours. Nothing posts until a person has approved it.", art: <SocialMock /> },
   { tag: "Keep it current", title: "Manage what is live", body: "The Published section lists everything on the news site. Editing an article is a reporter or editor action; deleting is an editor action. Edits and deletes are immediate and permanent on the live site.", art: <PublishedMock /> },
 ];
 
@@ -233,7 +233,7 @@ const TOUR_STEPS: TourStep[] = [
   { selector: '.side a[href="/stories"]', title: "Stories", body: "Create and work a story here: sources, evidence, the reporting log, verification claims, the script, the D1-4LS score, and the review checklist.", placement: "right" },
   { selector: '.side a[href="/ai"]', title: "AI Desk", body: "Generate drafts from the wire. Each one lands as a story in Verification, marked AI, and goes through the full workflow.", placement: "right" },
   { selector: '.side a[href="/review"]', title: "Review Queue", body: "Where stories waiting on verification and editor approval gather. Clear claims and the checklist to move them up the ladder.", placement: "right" },
-  { selector: '.side a[href="/social"]', title: "Social — Make Dot 1 Seen", body: "Turn published stories into branded Instagram and Facebook posts. Review, approve, and schedule or post now. Nothing goes out unapproved.", placement: "right" },
+  { selector: '.side a[href="/social"]', title: "Social — Make Discernt Seen", body: "Turn published stories into branded Instagram and Facebook posts. Review, approve, and schedule or post now. Nothing goes out unapproved.", placement: "right" },
   { selector: '.side a[href="/published"]', title: "Published", body: "Everything live on news.dot1.media and the app. Edit or remove articles, photos, and videos here; changes are immediate.", placement: "right" },
   { selector: '.side a[href="/broadcast"]', title: "Broadcast", body: "Run the live show and on-air graphics, publish recorded episodes, and go live to the site and app.", placement: "right" },
   { selector: '.side a[href="/accounts"]', title: "Accounts", body: "Owners grant roles and per-person capabilities here. If a page or button is missing for someone, this is where access is granted.", placement: "right" },
@@ -326,7 +326,7 @@ export default function GuidePage() {
           <P><b>What readers now see on the website.</b> On news.dot1.media a published article carries its full text (not just the summary), its colored verification dot, and its D1-4LS rating, which readers can tap to open the full breakdown of all twenty indicators. Everything a reader sees there follows from the status and score you set here.</P>
         </Section>
 
-        <Section title="Make Dot 1 Seen (social posts)" who={["Editor", "Owner"]}>
+        <Section title="Make Discernt Seen (social posts)" who={["Editor", "Owner"]}>
           <SocialMock />
           <P><b>Social</b> turns published stories into branded posts for Instagram and Facebook. Press <b>Generate from latest</b> to build draft cards from recent published stories; the layout alternates across three styles (A, B, C) so the feed looks varied. Each draft has a caption you can edit and a choice of targets, Instagram, Facebook, or both.</P>
           <P>Review a draft, then <b>Approve</b> and either <b>Schedule</b> it for a time or <b>Post now</b>. A background schedule also fills open slots automatically within active hours, at a steady, spaced cadence. <b>Nothing posts until a person has approved it</b>, and each post links back to the story. This is an editor or owner action.</P>

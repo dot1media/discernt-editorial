@@ -9,7 +9,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <header style={{ borderBottom: "1px solid rgba(20,18,16,.12)", background: "#fbf8f2" }}>
         <div style={{ maxWidth: 820, margin: "0 auto", padding: "20px 24px", display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
           <Link href="/policy/standards" style={{ fontFamily: "'Bodoni Moda', serif", fontWeight: 800, fontSize: 22, color: "#141210", textDecoration: "none" }}>
-            Dot 1 News
+            Discernt
           </Link>
           <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, letterSpacing: "0.22em", color: "#b81616" }}>
             A DECLARED STANDPOINT

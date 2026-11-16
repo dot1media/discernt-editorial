@@ -342,7 +342,7 @@ export async function ensureSchema(): Promise<void> {
   )`;
   await sql`CREATE INDEX IF NOT EXISTS idx_story_ratings_story ON story_ratings(story_id, created_at)`;
 
-  // Social posts queue ("Make Dot 1 Seen"): one row per queued social post built
+  // Social posts queue ("Make Discernt Seen"): one row per queued social post built
   // from a published news story. Generated as a draft, reviewed/edited, approved,
   // then posted to Facebook and Instagram on a spaced cadence.
   await sql`CREATE TABLE IF NOT EXISTS social_posts (

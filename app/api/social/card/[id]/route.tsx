@@ -105,8 +105,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     : style === "c" ? [W * S, 430 * S]
     : [W * S, 560 * S];
   const photo = await preparePhoto(rawPhoto, photoW, photoH);
-  const globeRed = new URL("/social-assets/globe-red.png", origin).toString();
-  const globeBone = new URL("/social-assets/globe-bone.png", origin).toString();
+  const emblem = new URL("/social-assets/discernt-emblem.png", origin).toString();
 
   const [bodoni, archivo, archivo6, plex] = await Promise.all([
     asset(origin, "Bodoni-700.ttf"),
@@ -115,38 +114,38 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     asset(origin, "Plex-600.ttf"),
   ]);
 
-  const globeH = 52, globeW = Math.round((globeH * 449) / 1024);
+  const embH = 60, embW = Math.round((embH * 1312) / 1199);
+  const footEmbH = 34, footEmbW = Math.round((footEmbH * 1312) / 1199);
   const pad = 64;
 
   const Masthead = (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 40, paddingBottom: 16 }}>
       <div style={{ display: "flex", alignItems: "center" }}>
-        <span style={{ fontFamily: "Bodoni", fontWeight: 700, color: BONE, fontSize: 44, letterSpacing: 6 }}>DOT</span>
-        <img src={globeRed} width={globeW} height={globeH} style={{ marginLeft: 10, marginRight: 10 }} alt="" />
-        <span style={{ fontFamily: "Bodoni", fontWeight: 700, color: BONE, fontSize: 44, letterSpacing: 6 }}>NEWS</span>
+        <img src={emblem} width={embW} height={embH} style={{ marginRight: 14 }} alt="" />
+        <span style={{ fontFamily: "Bodoni", fontWeight: 700, color: BONE, fontSize: 44, letterSpacing: 6 }}>DISCERNT</span>
       </div>
-      <span style={{ fontFamily: "Plex", fontWeight: 600, color: GOLD, fontSize: 14, letterSpacing: 5, marginTop: 10 }}>A DECLARED STANDPOINT</span>
+      <span style={{ fontFamily: "Plex", fontWeight: 600, color: GOLD, fontSize: 14, letterSpacing: 5, marginTop: 10 }}>INTERPRETING THE TIMES</span>
     </div>
   );
 
   const Footer = (
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "space-between", paddingLeft: pad, paddingRight: pad, paddingTop: 22, paddingBottom: 22, borderTop: `1px solid ${HAIR}`, backgroundColor: INK }}>
       <div style={{ display: "flex", alignItems: "center" }}>
-        <img src={globeBone} width={Math.round((30 * 449) / 1024)} height={30} alt="" />
+        <img src={emblem} width={footEmbW} height={footEmbH} alt="" />
         <span style={{ fontFamily: "Bodoni", fontWeight: 700, color: BONE, fontSize: 22, letterSpacing: 3, marginLeft: 10 }}>DISCERNT</span>
       </div>
-      <span style={{ fontFamily: "Plex", fontWeight: 600, color: MUTED, fontSize: 15, letterSpacing: 1.5 }}>@{META.handle} · news.dot1.media</span>
+      <span style={{ fontFamily: "Plex", fontWeight: 600, color: MUTED, fontSize: 15, letterSpacing: 1.5 }}>@{META.handle} · discernt.dot1.media</span>
     </div>
   );
 
   const Kicker = (
-    <div style={{ display: "flex", backgroundColor: CRIMSON, color: BONE, fontFamily: "Plex", fontWeight: 600, fontSize: 16, letterSpacing: 3, padding: "7px 14px" }}>{category}</div>
+    <div style={{ display: "flex", backgroundColor: CRIMSON, color: INK, fontFamily: "Plex", fontWeight: 600, fontSize: 16, letterSpacing: 3, padding: "7px 14px" }}>{category}</div>
   );
 
   const VLine = (
     <div style={{ display: "flex", alignItems: "center" }}>
       <div style={{ width: 14, height: 14, borderRadius: 999, backgroundColor: vcol }} />
-      <span style={{ fontFamily: "Archivo", fontWeight: 600, color: MUTED, fontSize: 18, marginLeft: 10 }}>Discerntroom</span>
+      <span style={{ fontFamily: "Archivo", fontWeight: 600, color: MUTED, fontSize: 18, marginLeft: 10 }}>Newsroom</span>
     </div>
   );
 

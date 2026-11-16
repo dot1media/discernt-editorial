@@ -267,7 +267,7 @@ ${multi
 
 Close the brief with a section. Put its heading on its own line, exactly the words below, with no asterisks and no other punctuation:
 Through the Lens
-Then write 90 to 140 words. This is where Dot 1's voice speaks: warm, pastoral, intellectually honest. Connect the story to a specific biblical principle or passage (you may cite real references like "Micah 6:8", but never fabricate quotations). Name the human-dignity dimension. Avoid date-setting, avoid certainty about God's intentions in current events, avoid partisan cues. End with ONE contemplative question the reader can carry.
+Then write 90 to 140 words. This is where Discernt's voice speaks: warm, pastoral, intellectually honest. Connect the story to a specific biblical principle or passage (you may cite real references like "Micah 6:8", but never fabricate quotations). Name the human-dignity dimension. Avoid date-setting, avoid certainty about God's intentions in current events, avoid partisan cues. End with ONE contemplative question the reader can carry.
 
 OUTPUT, ONLY a JSON object, no fences, no preamble:
 {

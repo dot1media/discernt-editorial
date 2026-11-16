@@ -71,43 +71,43 @@ export const INDICATOR_DB_COLUMN: Record<keyof IndicatorScores, string> = {
 
 export const INDEX_META: { key: "BAI" | "PSI" | "SCI" | "HII"; name: string; indicators: { key: keyof IndicatorScores; label: string; anchors: [string, string, string] }[] }[] = [
   {
-    key: "BAI", name: "Biblical Alignment",
+    key: "BAI", name: "Scriptural Grounding",
     indicators: [
       { key: "baiScripturalConsistency", label: "Scriptural Consistency", anchors: ["Contradicts clear biblical teaching", "Neutral or indirect alignment", "Explicitly consistent with Scripture"] },
-      { key: "baiDoctrinalIntegrity", label: "Doctrinal Integrity", anchors: ["Affirms false or heretical claims", "Avoids error but lacks clarity", "Aligns with historic orthodoxy"] },
-      { key: "baiMoralFramework", label: "Moral Framework", anchors: ["Relativistic or anti-biblical ethics", "Mixed or implicit moral stance", "Coherent biblical moral logic"] },
-      { key: "baiAnthropology", label: "Anthropology", anchors: ["Dehumanizing or reductionist", "Partially dignifying", "Affirms imago Dei"] },
-      { key: "baiTeleology", label: "Teleology", anchors: ["Purposeless or nihilistic", "Implicit meaning", "Points toward divine purpose"] },
+      { key: "baiDoctrinalIntegrity", label: "Doctrinal Soundness", anchors: ["Affirms false or heretical claims", "Avoids error but lacks clarity", "Consistent with the historic Christian faith"] },
+      { key: "baiMoralFramework", label: "Christ-Centeredness", anchors: ["Points away from Christ, toward spectacle", "Christ implicit or peripheral", "Clearly points to Jesus"] },
+      { key: "baiAnthropology", label: "Image-Bearer Dignity", anchors: ["Dehumanizing or reductionist", "Partially dignifying", "Affirms every person as an image-bearer"] },
+      { key: "baiTeleology", label: "Hope & Purpose", anchors: ["Purposeless or nihilistic", "Implicit meaning", "Carries redemptive hope and purpose"] },
     ],
   },
   {
-    key: "PSI", name: "Prophetic Significance",
+    key: "PSI", name: "Kingdom Significance",
     indicators: [
-      { key: "psiTextualLinkage", label: "Textual Linkage", anchors: ["No scriptural connection", "Loose thematic echo", "Clear textual grounding"] },
-      { key: "psiEschatologicalFit", label: "Eschatological Fit", anchors: ["Forced or sensational", "Plausible relevance", "Sober, well-fitted"] },
-      { key: "psiHistoricalContinuity", label: "Historical Continuity", anchors: ["Ahistorical claim", "Some continuity", "Strong historical grounding"] },
-      { key: "psiSpiritualImpact", label: "Spiritual Impact", anchors: ["Trivial or distracting", "Mild significance", "Genuine spiritual weight"] },
-      { key: "psiTheologicalRestraint", label: "Theological Restraint", anchors: ["Speculation as certainty", "Some overreach", "Relevance held with humility"] },
+      { key: "psiTextualLinkage", label: "Gospel Advance", anchors: ["No gospel bearing", "Indirect bearing on the gospel", "The gospel clearly advancing"] },
+      { key: "psiEschatologicalFit", label: "Movement of God", anchors: ["No sign of God at work", "Possible but unclear", "A documented move of God: revival, awakening, the church growing or enduring"] },
+      { key: "psiHistoricalContinuity", label: "Redemption & Transformation", anchors: ["No life changed", "Some change", "Lives visibly redeemed and transformed"] },
+      { key: "psiSpiritualImpact", label: "Answered Prayer", anchors: ["No prayer dimension", "Prayer present but incidental", "Clear, recounted answer to prayer"] },
+      { key: "psiTheologicalRestraint", label: "Discernment & Restraint", anchors: ["Speculation or date-setting as certainty", "Some overreach", "Held soberly, with humility and watchfulness"] },
     ],
   },
   {
     key: "SCI", name: "Source Credibility",
     indicators: [
-      { key: "sciPrimarySourceAccess", label: "Primary Source Access", anchors: ["No primary sourcing", "Some primary access", "Direct primary sources"] },
-      { key: "sciVerification", label: "Verification", anchors: ["Unverified", "Partially corroborated", "Independently corroborated"] },
-      { key: "sciTransparency", label: "Transparency", anchors: ["Opaque sourcing", "Partial disclosure", "Fully transparent"] },
+      { key: "sciPrimarySourceAccess", label: "Primary-Source Access", anchors: ["No primary sourcing", "Some primary access", "Firsthand accounts, named witnesses, or primary documents"] },
+      { key: "sciVerification", label: "Verification & Corroboration", anchors: ["Unverified", "Partially corroborated", "Independently corroborated, especially any miracle or healing claim"] },
+      { key: "sciTransparency", label: "Outlet Transparency", anchors: ["Opaque sourcing", "Partial disclosure", "Fully transparent"] },
       { key: "sciTrackRecord", label: "Track Record", anchors: ["Poor reliability", "Mixed record", "Strong reliability"] },
       { key: "sciEditorialStandards", label: "Editorial Standards", anchors: ["No visible standards", "Some standards", "Rigorous standards"] },
     ],
   },
   {
-    key: "HII", name: "Humanities Impact",
+    key: "HII", name: "Fruit & Edification",
     indicators: [
-      { key: "hiiHumanDignity", label: "Human Dignity", anchors: ["Degrades persons", "Neutral", "Upholds dignity"] },
-      { key: "hiiCompassionEmpathy", label: "Compassion & Empathy", anchors: ["Callous", "Detached", "Genuinely compassionate"] },
-      { key: "hiiSocietalImpact", label: "Societal Impact", anchors: ["Harmful", "Neutral", "Constructive"] },
-      { key: "hiiJusticeResponsibility", label: "Justice & Responsibility", anchors: ["Unjust framing", "Mixed", "Just and responsible"] },
-      { key: "hiiChristModeledCare", label: "Christ-Modeled Care", anchors: ["Contrary to Christ's example", "Partial", "Reflects Christ's care"] },
+      { key: "hiiHumanDignity", label: "Faith Encouragement", anchors: ["Discourages or corrodes faith", "Neutral", "Strengthens and encourages faith"] },
+      { key: "hiiCompassionEmpathy", label: "Compassion & Mercy", anchors: ["Callous", "Detached", "Genuinely compassionate and merciful"] },
+      { key: "hiiSocietalImpact", label: "Fruit of the Spirit", anchors: ["Stirs division or strife", "Neutral", "Reconciliation, peace, and love evident"] },
+      { key: "hiiJusticeResponsibility", label: "Justice & Righteousness", anchors: ["Unjust framing", "Mixed", "Just and righteous"] },
+      { key: "hiiChristModeledCare", label: "Glory to God", anchors: ["Glorifies people or platforms", "Partial", "Gives glory to God"] },
     ],
   },
 ];

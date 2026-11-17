@@ -8,16 +8,22 @@
  *
  * Given the lead outlet's report, we ask Google News (keyless RSS search) which
  * OTHER outlets are covering the same event, keep only the ones whose headline
- * genuinely overlaps the event, and hand them back as additional SourceMembers.
- * The writer then synthesizes one account across outlets and attributes where
- * they converge and diverge; the independent scorer raises Source Credibility
+ * genuinely overlaps the event, then for each one:
+ *   - resolve the Google News redirect to the publisher's own canonical URL, so
+ *     the citation points at the outlet, not the aggregator, and
+ *   - fetch a real excerpt (og:description / meta description) from that page,
+ *     so the writer has genuine cross-outlet TEXT to synthesize, not just a
+ *     headline.
+ * The writer then writes one account across outlets and attributes where they
+ * converge and diverge; the independent scorer raises Source Credibility
  * (verification) only because several outlets now carry the same facts.
  *
  * This never publishes anything: corroborating outlets land in the draft's
  * dossier as PENDING sources, their claims stay "unconfirmed", and confidence
  * stays developing/moderate until a human completes the dual-rater review. It
  * is a research aid for the editor, not a verification shortcut. Any failure
- * (network, parse, no results) returns [] so a run is never broken.
+ * (network, parse, no results) degrades gracefully — a story is still written
+ * from whatever outlets we already have.
  */
 
 import { parseFeedBody } from './rss';
@@ -97,6 +103,19 @@ function baselineFor(outlet: string): SciBaseline {
   return KNOWN[outlet.toLowerCase()] || { transparency: 1, trackRecord: 1, editorialStandards: 1 };
 }
 
+/* ----------------------------- fetch helpers ----------------------------- */
+
+const GOOGLE_HOST = /(?:^|\.)google\.com$|(?:^|\.)gstatic\.com$|(?:^|\.)googleusercontent\.com$/i;
+function hostOf(u: string): string { try { return new URL(u).hostname; } catch { return ''; } }
+function isGoogle(u: string): boolean { return GOOGLE_HOST.test(hostOf(u)); }
+
+function decodeEntities(s: string): string {
+  return String(s || '')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
 async function fetchXml(url: string, timeoutMs: number): Promise<string | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -114,16 +133,100 @@ async function fetchXml(url: string, timeoutMs: number): Promise<string | null> 
   }
 }
 
+async function fetchHtml(url: string, timeoutMs: number): Promise<{ finalUrl: string; html: string } | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal, redirect: 'follow',
+      headers: { 'User-Agent': UA, Accept: 'text/html,application/xhtml+xml' },
+    });
+    if (!res.ok) return null;
+    const html = (await res.text()).slice(0, 250000); // head is enough for meta tags
+    return { finalUrl: res.url || url, html };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function metaContent(html: string, patterns: RegExp[]): string {
+  for (const p of patterns) {
+    const m = html.match(p);
+    if (m && m[1]) return m[1].trim();
+  }
+  return '';
+}
+function extractDescription(html: string): string {
+  const d = metaContent(html, [
+    /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i,
+    /<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+name=["']twitter:description["'][^>]+content=["']([^"']+)["']/i,
+  ]);
+  return decodeEntities(d).replace(/\s+/g, ' ').trim().slice(0, 600);
+}
+function extractCanonical(html: string): string {
+  const c = metaContent(html, [
+    /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i,
+    /<meta[^>]+property=["']og:url["'][^>]+content=["']([^"']+)["']/i,
+  ]);
+  return /^https?:\/\//i.test(c) && !isGoogle(c) ? decodeEntities(c) : '';
+}
+/** Pull the publisher destination out of a Google News interstitial page. */
+function targetFromGoogle(html: string): string {
+  const re = /(?:href|data-n-au)=["'](https?:\/\/[^"']+)["']/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html))) {
+    const u = m[1];
+    if (!isGoogle(u) && !/(?:schema|w3|gmpg|ogp)\.org|gvt\d\.com/.test(u)) return decodeEntities(u);
+  }
+  return '';
+}
+
+/** Resolve a Google News (or direct) link to the publisher's canonical URL and
+ *  a real excerpt. Best-effort: returns the original link and an empty excerpt
+ *  on any failure. */
+async function resolveArticle(link: string, timeoutMs: number): Promise<{ url: string; excerpt: string }> {
+  if (!isGoogle(link)) {
+    const r = await fetchHtml(link, timeoutMs);
+    if (!r) return { url: link, excerpt: '' };
+    return { url: extractCanonical(r.html) || (isGoogle(r.finalUrl) ? link : r.finalUrl), excerpt: extractDescription(r.html) };
+  }
+  const r = await fetchHtml(link, timeoutMs);
+  if (!r) return { url: link, excerpt: '' };
+  if (!isGoogle(r.finalUrl)) {
+    // The redirect already landed us on the publisher's page.
+    return { url: extractCanonical(r.html) || r.finalUrl, excerpt: extractDescription(r.html) };
+  }
+  // Still on Google: dig the destination out of the interstitial, then fetch it.
+  const tgt = targetFromGoogle(r.html);
+  if (tgt) {
+    const r2 = await fetchHtml(tgt, timeoutMs);
+    if (r2) return { url: extractCanonical(r2.html) || (isGoogle(r2.finalUrl) ? tgt : r2.finalUrl), excerpt: extractDescription(r2.html) };
+    return { url: tgt, excerpt: '' };
+  }
+  return { url: link, excerpt: '' };
+}
+
+/* -------------------------------- public --------------------------------- */
+
 export interface CorroborateOpts {
   /** How many ADDITIONAL distinct outlets to try to add. */
   want: number;
+  /** Budget for the discovery RSS fetch. */
   timeoutMs?: number;
+  /** Budget for each per-article resolve+excerpt fetch. */
+  perArticleMs?: number;
 }
 
 /**
  * Find additional outlets covering the lead member's event. Returns up to
  * `want` SourceMembers, each a distinct outlet not already present, whose
- * headline overlaps the event. Best-effort and side-effect free.
+ * headline overlaps the event — with the publisher's canonical URL and a real
+ * excerpt attached where they could be resolved. Best-effort and side-effect
+ * free.
  */
 export async function corroborate(
   lead: SourceMember,
@@ -145,40 +248,48 @@ export async function corroborate(
   const leadTokens = tokens(lead.item.title);
   const leadWhen = lead.item.publishedAt?.getTime() ?? null;
   const taken = new Set<string>([...existingOutlets].map((n) => n.toLowerCase()));
-  const out: SourceMember[] = [];
 
+  // First pass: pick the distinct, on-event outlets (cheap, no network).
+  const picked: { headline: string; outlet: string; it: typeof items[number] }[] = [];
   for (const it of items) {
-    if (out.length >= want) break;
+    if (picked.length >= want) break;
     const { headline, outlet } = splitOutlet(it.title);
     if (!outlet || !it.link) continue;
     const key = outlet.toLowerCase();
     if (taken.has(key)) continue;                       // one member per outlet, and never the lead's outlet
 
-    // Same event: the corroborating headline must share the lead's distinctive words.
     const ct = tokens(headline);
     let inter = 0;
     for (const t of ct) if (leadTokens.has(t)) inter++;
     const union = ct.size + leadTokens.size - inter;
     const jaccard = union ? inter / union : 0;
-    if (!(inter >= 2 || jaccard >= 0.3)) continue;
+    if (!(inter >= 2 || jaccard >= 0.3)) continue;      // same event only
 
-    // Recency: within six days of the lead when both dates are known.
     if (leadWhen && it.publishedAt) {
-      if (Math.abs(it.publishedAt.getTime() - leadWhen) > 6 * 24 * 3600 * 1000) continue;
+      if (Math.abs(it.publishedAt.getTime() - leadWhen) > 6 * 24 * 3600 * 1000) continue; // recent only
     }
-
     taken.add(key);
+    picked.push({ headline, outlet, it });
+  }
+  if (picked.length === 0) return [];
+
+  // Second pass: resolve each to the publisher's canonical URL + a real excerpt,
+  // in parallel so this adds one round-trip, not one per outlet.
+  const perMs = opts.perArticleMs ?? 5000;
+  const resolved = await Promise.allSettled(picked.map((p) => resolveArticle(p.it.link, perMs)));
+
+  return picked.map((p, i) => {
+    const r = resolved[i].status === 'fulfilled' ? (resolved[i] as PromiseFulfilledResult<{ url: string; excerpt: string }>).value : { url: p.it.link, excerpt: '' };
+    const link = r.url || p.it.link;
+    const description = r.excerpt || p.it.description || '';
     const source: FeedSource = {
-      id: `corr-${slug(outlet)}`,
-      name: outlet,
-      url: it.link,
+      id: `corr-${slug(p.outlet)}`,
+      name: p.outlet,
+      url: link,
       category: lead.source.category as NewsCategory,
-      sciBaseline: baselineFor(outlet),
+      sciBaseline: baselineFor(p.outlet),
       enabled: true,
     };
-    // Carry the cleaned headline (outlet suffix stripped) so the writer and the
-    // dossier read naturally.
-    out.push({ item: { ...it, title: headline }, source });
-  }
-  return out;
+    return { item: { ...p.it, title: p.headline, link, description }, source };
+  });
 }

@@ -43,6 +43,32 @@ function tokens(title: string): Set<string> {
   );
 }
 
+// Distinctive entities — proper nouns and multi-digit numbers — which identify
+// an event ACROSS languages (place names, people, organizations, dates and
+// counts survive translation; ordinary words do not). This is what lets a
+// Spanish or Portuguese report be matched to an English lead.
+function strongTokens(title: string): Set<string> {
+  const out = new Set<string>();
+  for (const m of (title || '').matchAll(/\b\d{2,}\b/g)) out.add(m[0]);
+  for (const w of (title || '').split(/\s+/)) {
+    const bare = w.replace(/[^\p{L}\p{N}]/gu, '');
+    if (bare.length >= 3 && /^\p{Lu}/u.test(bare)) out.add(bare.toLowerCase());
+  }
+  return out;
+}
+
+// Discernt launches in English, Spanish, Portuguese and French, and its mission
+// is global (the gospel among every people, the persecuted church). For the
+// world beat we also ask Google News in those languages so international faith
+// events are corroborated from regional outlets, not just English ones.
+interface Locale { lang: string; label: string; hl: string; gl: string; ceid: string }
+const EN_LOCALE: Locale = { lang: 'en', label: 'English', hl: 'en-US', gl: 'US', ceid: 'US:en' };
+const INTL_LOCALES: Locale[] = [
+  { lang: 'es', label: 'Spanish', hl: 'es-419', gl: 'MX', ceid: 'MX:es-419' },
+  { lang: 'pt', label: 'Portuguese', hl: 'pt-BR', gl: 'BR', ceid: 'BR:pt-419' },
+  { lang: 'fr', label: 'French', hl: 'fr', gl: 'FR', ceid: 'FR:fr' },
+];
+
 /** Build a news-search query from the lead headline: its most distinctive words,
  *  proper-noun-looking terms first, capped so the query stays specific. */
 function queryFromTitle(title: string): string {
@@ -129,11 +155,12 @@ interface GNItem {
   publishedAt: Date | null;
   sourceName: string;
   sourceUrl: string;
+  lang: string;
 }
 
 /** Parse Google News RSS, keeping the per-item <source url="…">Name</source>
  *  so we can see each item's actual publisher domain without resolving it. */
-function parseGoogleNews(xml: string): GNItem[] {
+function parseGoogleNews(xml: string, lang: string): GNItem[] {
   const blocks = xml.match(/<item[\s>][\s\S]*?<\/item>/gi) || [];
   const out: GNItem[] = [];
   for (const b of blocks) {
@@ -153,6 +180,7 @@ function parseGoogleNews(xml: string): GNItem[] {
       publishedAt,
       sourceName: sm ? stripTags(sm[2]) : '',
       sourceUrl: sm ? decodeEntities(sm[1]) : '',
+      lang,
     });
   }
   return out;
@@ -278,11 +306,16 @@ async function resolveArticle(link: string, timeoutMs: number): Promise<{ url: s
 export interface CorroborateOpts {
   /** How many ADDITIONAL distinct outlets to try to add. */
   want: number;
-  /** Budget for the discovery RSS fetch. */
+  /** Budget for each discovery RSS fetch (per locale). */
   timeoutMs?: number;
   /** Budget for each per-article resolve+excerpt fetch. */
   perArticleMs?: number;
+  /** Also search the app's launch languages for regional coverage. Defaults to
+   *  true for the world beat, false otherwise. */
+  international?: boolean;
 }
+
+const LANG_LABEL: Record<string, string> = { en: 'English', es: 'Spanish', pt: 'Portuguese', fr: 'French' };
 
 /**
  * Find additional outlets covering the lead member's event. Returns up to
@@ -301,23 +334,41 @@ export async function corroborate(
   const q = queryFromTitle(lead.item.title);
   if (q.length < 6) return [];
 
-  const url =
-    'https://news.google.com/rss/search?' +
-    new URLSearchParams({ q, hl: 'en-US', gl: 'US', ceid: 'US:en' }).toString();
-  const xml = await fetchXml(url, opts.timeoutMs ?? 9000);
-  if (!xml) return [];
+  // English always; for the world beat (international faith events) also ask in
+  // the app's launch languages so regional outlets corroborate the story.
+  const international = opts.international ?? (lead.source.category === 'world');
+  const locales = international ? [EN_LOCALE, ...INTL_LOCALES] : [EN_LOCALE];
+  const searched = await Promise.allSettled(
+    locales.map(async (loc) => {
+      const url = 'https://news.google.com/rss/search?' +
+        new URLSearchParams({ q, hl: loc.hl, gl: loc.gl, ceid: loc.ceid }).toString();
+      const xml = await fetchXml(url, opts.timeoutMs ?? 9000);
+      return xml ? parseGoogleNews(xml, loc.lang) : [];
+    }),
+  );
+  const items: GNItem[] = searched.flatMap((s) => (s.status === 'fulfilled' ? s.value : []));
+  if (items.length === 0) return [];
 
-  const items = parseGoogleNews(xml);
   const leadTokens = tokens(lead.item.title);
+  const leadStrong = strongTokens(lead.item.title);
   const leadWhen = lead.item.publishedAt?.getTime() ?? null;
   const taken = new Set<string>([...existingOutlets].map((n) => n.toLowerCase()));
 
-  const onEvent = (headline: string): boolean => {
-    const ct = tokens(headline);
-    let inter = 0;
-    for (const t of ct) if (leadTokens.has(t)) inter++;
-    const union = ct.size + leadTokens.size - inter;
-    return inter >= 2 || (union ? inter / union : 0) >= 0.3;
+  // Same event: English coverage is matched on word overlap; non-English
+  // coverage on shared distinctive entities (proper nouns / numbers), the part
+  // of a headline that survives translation.
+  const onEvent = (it: GNItem, headline: string): boolean => {
+    if (it.lang === 'en') {
+      const ct = tokens(headline);
+      let inter = 0;
+      for (const t of ct) if (leadTokens.has(t)) inter++;
+      const union = ct.size + leadTokens.size - inter;
+      return inter >= 2 || (union ? inter / union : 0) >= 0.3;
+    }
+    const cs = strongTokens(headline);
+    let s = 0;
+    for (const t of cs) if (leadStrong.has(t)) s++;
+    return s >= 1;
   };
   const recent = (it: GNItem): boolean =>
     !(leadWhen && it.publishedAt && Math.abs(it.publishedAt.getTime() - leadWhen) > 6 * 24 * 3600 * 1000);
@@ -334,7 +385,7 @@ export async function corroborate(
     if (!outlet || !it.link) continue;
     const key = outlet.toLowerCase();
     if (taken.has(key)) continue;                       // one member per outlet, never the lead's
-    if (!onEvent(headline) || !recent(it)) continue;    // same event, recent
+    if (!onEvent(it, headline) || !recent(it)) continue; // same event, recent
 
     const kind = primaryKind(it);
     if (kind) {
@@ -358,7 +409,10 @@ export async function corroborate(
       ? (resolved[i] as PromiseFulfilledResult<{ url: string; excerpt: string }>).value
       : { url: p.it.link, excerpt: '' };
     const link = r.url || p.it.link;
-    const description = r.excerpt || p.it.description || '';
+    // Tag non-English coverage so the writer attributes it as such and the
+    // dossier shows the reach ("as reported in Spanish by …").
+    const langTag = p.it.lang !== 'en' ? `[${LANG_LABEL[p.it.lang] || p.it.lang}-language coverage] ` : '';
+    const description = langTag + (r.excerpt || p.it.description || '');
     const source: FeedSource = {
       id: `${p.kind ? 'primary' : 'corr'}-${slug(p.outlet)}`,
       name: p.outlet,

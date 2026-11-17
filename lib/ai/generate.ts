@@ -14,6 +14,16 @@ const PRIMARY_LABEL: Record<string, string> = {
 function isPrimaryMember(m: { source: FeedSource }): boolean {
   return !!m.source.sourceType && PRIMARY_SOURCE_TYPES.has(m.source.sourceType);
 }
+
+// A URL that looks like a site's default/logo/placeholder rather than this
+// article's own photo. Used to reject a generic feed or og:image so the story
+// gets a matched illustration (or the branded category fallback) instead of a
+// masthead. Deliberately narrow: ordinary article images (dated paths, "card"
+// or "og-image" names) are NOT rejected.
+const GENERIC_IMG = /(?:^|[/_-])(logos?|default|defaults|placeholder|fallback|favicons?|icons?|sprite|avatar|blank|missing|brand|wordmark)(?:[/_.-]|$)|\.svg(?:$|\?)/i;
+function looksGenericImage(url: string): boolean {
+  try { const u = new URL(url); return GENERIC_IMG.test(u.pathname); } catch { return GENERIC_IMG.test(url); }
+}
 import { EDITORIAL_THESIS, turningsForPrompt } from './editorialThesis';
 import {
   IndicatorScores,
@@ -167,7 +177,9 @@ function buildTemplateArticle(members: SourceMember[]): GeneratedArticle {
     content: humanizeProse(content),
     image: item.imageUrl || fallbackImageFor(source.category, item.link),
     imageCredit: '',
-    imageIllustrative: false,
+    // Outlet's own photo → real; a category fallback is a generic illustration,
+    // so it is labelled as one rather than passing as a photo of the event.
+    imageIllustrative: !item.imageUrl,
     tags: [source.category, 'curated'],
     citations: citationsFrom(members),
     editorNote: '',
@@ -493,7 +505,9 @@ function buildTwoPassArticle(
     editorNote: humanizeProse(draft.editorNote),
     image: item.imageUrl || fallbackImageFor(source.category, item.link),
     imageCredit: '',
-    imageIllustrative: false,
+    // Outlet's own photo → real; a category fallback is a generic illustration,
+    // so it is labelled as one rather than passing as a photo of the event.
+    imageIllustrative: !item.imageUrl,
     tags: draft.tags,
     citations: citationsFrom(members),
     claims: scored?.claims ?? [],
@@ -529,9 +543,12 @@ export async function generateArticle(
   const members: SourceMember[] = [{ item, source }, ...related];
   // Prefer the outlet's own photojournalism: if the feed carried no image,
   // pull the article page's og:image before any generic fallback. Best-effort;
-  // any failure leaves the category fallback in place.
+  // any failure leaves the category fallback in place. A feed or og:image that
+  // is plainly a site logo/placeholder is dropped so the story gets a matched
+  // illustration instead of a masthead.
+  if (item.imageUrl && looksGenericImage(item.imageUrl)) item.imageUrl = null;
   if (!item.imageUrl) {
-    try { const og = await fetchOgImage(item.link, 4000); if (og) item.imageUrl = og; } catch {}
+    try { const og = await fetchOgImage(item.link, 4000); if (og && !looksGenericImage(og)) item.imageUrl = og; } catch {}
   }
   const apiKey = process.env.ANTHROPIC_API_KEY;
   let article: GeneratedArticle | null = null;

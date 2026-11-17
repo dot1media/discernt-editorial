@@ -17,16 +17,26 @@ const IMAGE_STOPWORDS = new Set([
   'says', 'said', 'amid', 'new', 'how', 'why', 'what', 'who', 'plans', 'plan',
 ]);
 
-/** Content tokens of a phrase: lowercased words of 4+ letters that aren't stopwords. */
+/** Content tokens of a phrase: lowercased words of 3+ letters that aren't
+ *  stopwords (3 so meaningful short words like oil, gun, war, aid, law count). */
 function contentTokens(text: string): string[] {
-  return (text.toLowerCase().match(/[a-z]{4,}/g) || []).filter((t) => !IMAGE_STOPWORDS.has(t));
+  return (text.toLowerCase().match(/[a-z]{3,}/g) || []).filter((t) => !IMAGE_STOPWORDS.has(t));
+}
+
+// Openverse metadata that marks a result as NOT a news-usable photograph of the
+// subject: logos, icons, diagrams, clip art, and the like. A map is allowed (it
+// can legitimately illustrate a place).
+const NON_PHOTO = /\b(logo|icon|clipart|clip art|sprite|watermark|favicon|emoji|wordmark|infographic|diagram|vector|illustration of a|screenshot)\b/i;
+
+function resultHay(result: any): { title: string; all: string } {
+  const title = String(result?.title || '').toLowerCase();
+  const parts: string[] = [title];
+  if (Array.isArray(result?.tags)) for (const t of result.tags) parts.push(String(t?.name || '').toLowerCase());
+  return { title, all: parts.join(' ') };
 }
 
 /** How many distinct query tokens appear in an Openverse result's own title/tags. */
-function relevanceScore(queryTokens: string[], result: any): number {
-  const hayParts: string[] = [String(result?.title || '')];
-  if (Array.isArray(result?.tags)) for (const t of result.tags) hayParts.push(String(t?.name || ''));
-  const hay = hayParts.join(' ').toLowerCase();
+function relevanceScore(queryTokens: string[], hay: string): number {
   let hits = 0;
   for (const tok of queryTokens) if (hay.includes(tok)) hits++;
   return hits;
@@ -35,10 +45,15 @@ function relevanceScore(queryTokens: string[], result: any): number {
 export async function searchOpenverseImage(query: string, timeoutMs = 4500): Promise<SourcedImage | null> {
   const q = (query || '').trim();
   if (q.length < 3) return null;
-  // A result must share real subject words with the query, or it's rejected as
-  // off-topic. Short queries need one match; longer ones need at least two.
+  // A result must share the story's subject, not merely one incidental word.
+  // The ANCHOR (the most distinctive query token) must appear, AND enough of the
+  // whole query must match — so "Alaska pipeline" no longer matches a generic
+  // Alaska landscape that happens to say "Alaska".
   const queryTokens = contentTokens(q);
-  const minHits = queryTokens.length <= 2 ? 1 : 2;
+  if (queryTokens.length === 0) return null;
+  // Anchor = the longest content token (the proper noun / central object).
+  const anchor = queryTokens.reduce((a, b) => (b.length > a.length ? b : a), queryTokens[0]);
+  const minHits = queryTokens.length <= 1 ? 1 : Math.max(2, Math.ceil(queryTokens.length * 0.6));
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -70,11 +85,23 @@ export async function searchOpenverseImage(query: string, timeoutMs = 4500): Pro
       (r) => r?.url && /^https?:\/\//i.test(r.url) && (!r.width || r.width >= 1000),
     );
     const candidates = usable.length ? usable : results.filter((r) => r?.url && /^https?:\/\//i.test(r.url));
+    // Rank by title match first (a strong signal the photo IS the subject), then
+    // by total overlap. A result must contain the anchor, clear the hit floor,
+    // and not be a logo/icon/diagram, or it is rejected so the on-topic branded
+    // category fallback is kept instead of an unrelated picture.
     let pick: any = null;
-    let best = -1;
+    let bestTitle = -1;
+    let bestAll = -1;
     for (const r of candidates) {
-      const score = relevanceScore(queryTokens, r);
-      if (score >= minHits && score > best) { best = score; pick = r; }
+      const { title, all } = resultHay(r);
+      if (!all.includes(anchor)) continue;                 // subject must be present
+      if (NON_PHOTO.test(all)) continue;                   // not a logo/icon/diagram
+      const score = relevanceScore(queryTokens, all);
+      if (score < minHits) continue;
+      const titleScore = relevanceScore(queryTokens, title);
+      if (titleScore > bestTitle || (titleScore === bestTitle && score > bestAll)) {
+        bestTitle = titleScore; bestAll = score; pick = r;
+      }
     }
     if (!pick?.url) return null;
     const creator = (pick.creator || 'Unknown').toString().slice(0, 80);

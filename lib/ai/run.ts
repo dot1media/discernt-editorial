@@ -281,6 +281,28 @@ export async function runGeneration(opts: { max?: number; only?: string } = {}):
     : null;
   const result: GenerateResult = { considered: 0, generated: 0, skipped: 0, failed: 0, drafts: [], errors: [] };
 
+  // Cross-run dedup: entity-aware fingerprints of recent story headlines, so an
+  // event we already wrote up does not come back as a near-duplicate under a
+  // different outlet's wording (exact-match alreadySeen misses those). Uses the
+  // same matcher as the clusterer, and is updated as this run writes, so two
+  // near-duplicate clusters in one run can't both land.
+  const recentFP: { tokens: Set<string>; strong: Set<string> }[] = [];
+  try {
+    const rows = await sql`
+      SELECT coalesce(nullif(final_headline, ''), working_headline) AS h
+      FROM stories
+      WHERE created_at > now() - interval '10 days'
+        AND coalesce(nullif(final_headline, ''), working_headline) <> ''`;
+    for (const r of rows as { h: string }[]) recentFP.push({ tokens: titleTokens(r.h), strong: strongTokens(r.h) });
+  } catch (e: any) {
+    result.errors.push(`recent-dedup load: ${e?.message || e}`);
+  }
+  const isFuzzyDuplicate = (title: string): boolean => {
+    const tk = titleTokens(title), st = strongTokens(title);
+    if (tk.size < 2) return false;
+    return recentFP.some((fp) => sameEvent(tk, fp.tokens, st, fp.strong));
+  };
+
   const feeds = getFeeds().filter((f) => f.enabled);
   // Gather candidate items across feeds.
   const candidates: SourceMember[] = [];
@@ -370,6 +392,9 @@ export async function runGeneration(opts: { max?: number; only?: string } = {}):
       for (const m of perOutlet) { if (await alreadySeen(m.item)) { seen = true; break; } }
       if (seen) { result.skipped += 1; continue; }
 
+      // Already covered recently under different wording? Skip the near-duplicate.
+      if (isFuzzyDuplicate(perOutlet[0].item.title)) { result.skipped += 1; continue; }
+
       // Active corroboration: an under-sourced event is topped up with other
       // outlets covering it (see corroborate.ts), so the desk writes from
       // several outlets rather than one. Best-effort: on any failure the story
@@ -390,6 +415,8 @@ export async function runGeneration(opts: { max?: number; only?: string } = {}):
       const id = await insertDraft(article, members);
       result.generated += 1;
       result.drafts.push({ id, headline: article.title, source: `${primary.source.name} +${related.length} more` });
+      // Guard the rest of this run against a near-duplicate of what we just wrote.
+      recentFP.push({ tokens: titleTokens(article.title), strong: strongTokens(article.title) });
     } catch (e: any) {
       result.failed += 1;
       result.errors.push(`generate "${cl.members[0]?.item.title?.slice(0, 40)}": ${e.message || e}`);

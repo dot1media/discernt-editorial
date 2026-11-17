@@ -97,7 +97,7 @@ export default function ScoreTab({ data, reload, can }: { data: any; reload: () 
             )}
           </div>
           <div className="table-wrap"><table className="grid-t">
-            <thead><tr><th>Rater</th><th>BAI</th><th>PSI</th><th>SCI</th><th>HII</th></tr></thead>
+            <thead><tr><th>Rater</th><th>SG</th><th>KS</th><th>SC</th><th>FE</th></tr></thead>
             <tbody>
               {ratings.map((r) => {
                 const t = computeIndexTotals(normalizeIndicators(r.scores || {}));

@@ -2,9 +2,9 @@
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: false },
-  // The public-facing policy pages live on news.dot1.media. The editorial domain is the newsroom
+  // The public-facing policy pages live on discernt.dot1.media. The editorial domain is the newsroom
   // back-office and should never be a public destination, so redirect any old /policy/* links to
-  // their news.dot1.media equivalents.
+  // their discernt.dot1.media equivalents.
   async redirects() {
     const map = {
       standards: "standards",
@@ -16,10 +16,10 @@ const nextConfig = {
     };
     return Object.entries(map).map(([from, to]) => ({
       source: `/policy/${from}`,
-      destination: `https://news.dot1.media/${to}`,
+      destination: `https://discernt.dot1.media/${to}`,
       permanent: true,
     })).concat([
-      { source: "/policy", destination: "https://news.dot1.media/standards", permanent: true },
+      { source: "/policy", destination: "https://discernt.dot1.media/standards", permanent: true },
     ]);
   },
 };

@@ -45,7 +45,7 @@ self.addEventListener("fetch", (e) => {
 self.addEventListener("push", (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (err) {}
-  const title = d.title || "Dot 1 News · Newsroom";
+  const title = d.title || "Discernt · Newsroom";
   e.waitUntil(self.registration.showNotification(title, { body: d.body || "", icon: "/dot1-news-icon-192.png", badge: "/dot1-news-icon-192.png", data: { url: d.url || "/" }, tag: d.tag || undefined, renotify: !!d.tag }));
 });
 self.addEventListener("notificationclick", (e) => {

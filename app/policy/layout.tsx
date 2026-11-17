@@ -12,7 +12,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             Discernt
           </Link>
           <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, letterSpacing: "0.22em", color: "#c8a24a" }}>
-            A DECLARED STANDPOINT
+            INTERPRETING THE TIMES
           </span>
         </div>
       </header>

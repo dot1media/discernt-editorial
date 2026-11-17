@@ -6,7 +6,7 @@ import Shell from "@/components/Shell";
 import { api, useMe } from "@/lib/client";
 import { CATEGORIES } from "@/lib/newsroom";
 import LensReelStudio from "@/components/LensReelStudio";
-import { Sparkles, RefreshCw, ExternalLink, Youtube } from "lucide-react";
+import { Sparkles, RefreshCw, ExternalLink, Youtube, BarChart3 } from "lucide-react";
 
 export default function AiDeskPage() {
   const { can } = useMe();
@@ -31,6 +31,18 @@ export default function AiDeskPage() {
   const [topicsBusy, setTopicsBusy] = useState(false);
   const [topicsMsg, setTopicsMsg] = useState("");
   const [topicsDirty, setTopicsDirty] = useState(false);
+
+  // Outlet reliability — read-only learning signal from human ratings.
+  const [rel, setRel] = useState<any>(null);
+  const [relBusy, setRelBusy] = useState(false);
+  const [relErr, setRelErr] = useState("");
+
+  async function loadReliability() {
+    setRelBusy(true); setRelErr("");
+    try { setRel(await api<any>("/api/ai/reliability")); }
+    catch (e: any) { setRelErr(e.message || "Could not load reliability."); }
+    finally { setRelBusy(false); }
+  }
 
   async function load() {
     const d = await api<{ drafts: any[] }>("/api/ai/drafts");
@@ -172,6 +184,40 @@ export default function AiDeskPage() {
             <button className="btn primary sm" onClick={saveTopics} disabled={topicsBusy || !topicsDirty}>{topicsBusy ? "Saving…" : "Save topics"}</button>
             {topicsMsg && <span className="tiny muted">{topicsMsg}</span>}
           </div>
+        </div>
+      )}
+
+      {can("story.create") && (
+        <div className="card pad" style={{ marginBottom: 14 }}>
+          <div className="mini" style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 7, justifyContent: "space-between" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 7 }}><BarChart3 size={14} /> OUTLET RELIABILITY</span>
+            <button className="btn ghost sm" onClick={loadReliability} disabled={relBusy}>{relBusy ? "Checking…" : rel ? "Refresh" : "Check now"}</button>
+          </div>
+          <div className="tiny muted" style={{ marginBottom: rel || relErr ? 12 : 0 }}>
+            How outlets actually perform, from human ratings and editor-resolved claims only (never the AI's own scores). Suggestions are advisory; baselines never change on their own.
+          </div>
+          {relErr && <div className="tiny" style={{ color: "#ffb4b4" }}>{relErr}</div>}
+          {rel && (rel.outlets?.length ? (
+            <div className="table-wrap"><table className="grid-t">
+              <thead><tr><th>Outlet</th><th>Rated</th><th>Human verif.</th><th>False/disputed</th><th>Track baseline</th><th>Suggestion</th></tr></thead>
+              <tbody>
+                {rel.outlets.map((o: any) => (
+                  <tr key={o.outlet}>
+                    <td style={{ fontWeight: 600 }}>{o.outlet}</td>
+                    <td className="mono tiny">{o.ratedStories}</td>
+                    <td className="mono tiny">{o.meanHumanVerification != null ? `${o.meanHumanVerification}/2` : "—"}</td>
+                    <td className="mono tiny">{o.badClaimRate != null ? `${Math.round(o.badClaimRate * 100)}%` : "—"}</td>
+                    <td className="mono tiny">{o.baseline ? `${o.baseline.trackRecord}/2` : "—"}</td>
+                    <td className="tiny">
+                      {o.suggestion
+                        ? <span className="chip" title={o.suggestion.reason} style={{ background: o.suggestion.direction === "up" ? "rgba(63,122,90,0.18)" : "rgba(192,57,43,0.18)" }}>track {o.suggestion.from}&rarr;{o.suggestion.to}</span>
+                        : <span className="muted">&middot;</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table></div>
+          ) : <div className="tiny muted" style={{ marginTop: 10 }}>No human-rated AI stories yet. Reliability builds as editors rate stories and resolve claims.</div>)}
         </div>
       )}
 

@@ -176,15 +176,28 @@ async function seedDossier(storyId: string, article: GeneratedArticle, members: 
   // 3) A provenance entry in the reporting log.
   const corroborated = members.filter((m) => m.source.id.startsWith("corr-")).length;
   const primaries = members.filter((m) => !!m.source.sourceType).length;
+  const disputes = (article.contradictions || []).length;
   const logEntry = clip(
     `AI Desk synthesized this draft from ${members.length} outlet${members.length > 1 ? "s" : ""} (${outletNames})` +
       (corroborated ? `, of which ${corroborated} ${corroborated > 1 ? "were" : "was"} added by active corroboration (news search)` : "") +
       (primaries ? `; ${primaries} primary source${primaries > 1 ? "s" : ""} (official document or statement) attached for verification` : "") +
+      (disputes ? `; ${disputes} cross-source contradiction${disputes > 1 ? "s" : ""} flagged as disputed for the editor to resolve` : "") +
       ` via the two-pass writer and independent D1-4LS scorer. ` +
       `Score confidence: ${article.scoreConfidence}. Sources, evidence, and candidate claims are auto-seeded; verification is pending editorial review.`,
     800,
   );
   await sql`INSERT INTO reporting_log (id, story_id, entry, author_email) VALUES (${newId("log")}, ${storyId}, ${logEntry}, ${"ai-desk"})`;
+
+  // 4a) Cross-source contradictions, as DISPUTED claims. A disputed claim holds
+  //     the story below "verified" until an editor resolves it, so a genuine
+  //     factual conflict between outlets cannot slip through to auto-publish.
+  for (const c of article.contradictions || []) {
+    const claimText = clip(`Sources disagree: ${c.point}`, 300);
+    if (!claimText) continue;
+    await sql`INSERT INTO verification_claims (id, story_id, claim, status, sources, notes, updated_by)
+      VALUES (${newId("clm")}, ${storyId}, ${claimText}, ${"disputed"}, ${clip(c.positions, 400)},
+        ${"Flagged by the AI desk as a factual disagreement between outlets. Resolve against the original reports, then set to confirmed or false once reconciled."}, ${"ai-desk"})`;
+  }
 
   // 4) The brief's factual claims, as an unconfirmed verification checklist.
   const primaryName = members[0].source.name;

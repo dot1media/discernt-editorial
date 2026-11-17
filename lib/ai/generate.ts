@@ -69,6 +69,10 @@ export interface GeneratedArticle {
   // Verifiable factual claims extracted from the brief, seeded into the story's
   // verification checklist as "unconfirmed" for the editor to confirm.
   claims: { claim: string; source: string }[];
+  // Material factual disagreements BETWEEN the source outlets, seeded as
+  // "disputed" claims so the editor must resolve them before the story can
+  // reach verified/ready-to-publish.
+  contradictions: { point: string; positions: string }[];
   generationMode: 'ai' | 'template';
 }
 
@@ -168,6 +172,7 @@ function buildTemplateArticle(members: SourceMember[]): GeneratedArticle {
     citations: citationsFrom(members),
     editorNote: '',
     claims: [],
+    contradictions: [],
     indicators,
     totals: computeIndexTotals(indicators),
     interpretation: 'This is a curated brief pending full assessment and independent human review. The four index scores describe different things and should be read together, not reduced to a single judgment; the score is not a measure of truth, importance, or endorsement.',
@@ -227,6 +232,7 @@ interface ScorerOutput {
   interpretation: string;
   confidence: 'low' | 'moderate' | 'high';
   claims: { claim: string; source: string }[];
+  contradictions: { point: string; positions: string }[];
 }
 
 const ARTICLE_INDICATORS = [
@@ -308,7 +314,7 @@ D1-4LS v3.0 INTERPRETATION PRINCIPLES (govern your scoring AND your written inte
 - Separation: keep scriptural and kingdom interpretation distinct from factual verification; distinguish a story's SUBJECT from its editorial TREATMENT.
 
 ORIGINAL SOURCE REPORTING (${members.length} outlet${members.length > 1 ? 's' : ''} on this event):
-${members.map((m, i) => `[${i + 1}] ${m.source.name}${isPrimaryMember(m) ? ' [PRIMARY SOURCE]' : ''}: ${m.item.title}`).join('\n')}
+${members.map((m, i) => `[${i + 1}] ${m.source.name}${isPrimaryMember(m) ? ' [PRIMARY SOURCE]' : ''}: ${m.item.title}${m.item.description ? `\n    ${m.item.description.slice(0, 300)}` : ''}`).join('\n')}
 ${members.length > 1 ? 'Independent corroboration counts for Source Credibility: when several outlets report the same facts, sciVerification should reflect that; when a claim rests on only one, it should not.' : ''}
 ${members.some(isPrimaryMember) ? `A PRIMARY source is present (${members.filter(isPrimaryMember).map((m) => m.source.name).join(', ')}). If the brief actually draws its core facts from it and attributes them, sciPrimarySourceAccess should reflect firsthand access (toward 2); if the brief does not use the primary source, do not credit it.` : ''}
 
@@ -330,6 +336,7 @@ ALSO produce:
 - "interpretation": a bounded, reader-facing interpretation of the WHOLE profile, 2 to 4 sentences, following this template: (1) name the profile's most distinctive supported features and which lenses they come from; (2) state the most important sourcing strength or limitation using Source Credibility; (3) clarify any boundary a reader might misread (for example that low Kingdom Significance is not weak journalism, or a high score is not an endorsement). Every clause must trace to a rationale above. Make NO claim of factual certainty, a settled move of God, endorsement, or overall quality from the total. No em-dashes, no markdown.
 - "confidence": "low" if the source summary is under ~40 words or claims are uncorroborated; "moderate" for typical single-outlet reporting; "high" only when the item itself contains primary/corroborated material.
 - "claims": the 3 to 6 most important FACTUAL assertions the brief makes that an editor must verify before publication (names, numbers, dates, events, direct quotes, causal or attributive claims). Quote or closely paraphrase each from the brief; do NOT invent any claim that is not in the brief. For each, set "source" to the outlet the brief attributes it to (default "${primary.source.name}"). If the brief makes no checkable factual claims, return an empty array.
+- "contradictions": MATERIAL factual disagreements BETWEEN the source outlets listed above (conflicting numbers, names, dates, locations, causation, or who said what), each as {"point": what is in dispute, "positions": how the outlets differ, naming them}. Only genuine conflicts of FACT, never differences of emphasis, framing, or a detail that one outlet simply omits. With a single source, or when the outlets do not actually conflict, return an empty array.
 
 OUTPUT — ONLY a JSON object, no fences:
 {
@@ -340,7 +347,8 @@ OUTPUT — ONLY a JSON object, no fences:
   "indexNotes": {"BAI": "one sentence", "PSI": "one sentence", "SCI": "one sentence", "HII": "one sentence"},
   "interpretation": "2 to 4 sentences per the template above",
   "confidence": "low|moderate|high",
-  "claims": [{"claim": "a factual assertion taken from the brief", "source": "${primary.source.name}"}]
+  "claims": [{"claim": "a factual assertion taken from the brief", "source": "${primary.source.name}"}],
+  "contradictions": [{"point": "what the outlets disagree on", "positions": "Outlet A reports X; Outlet B reports Y"}]
 }`;
 }
 
@@ -420,12 +428,23 @@ function validateScorer(s: any): ScorerOutput | null {
         .filter((c: { claim: string }) => c.claim.length > 0)
         .slice(0, 8)
     : [];
+  // Cross-source contradictions: best-effort, never fail the pass over them.
+  const contradictions = Array.isArray(s.contradictions)
+    ? s.contradictions
+        .map((c: any) => ({
+          point: String(c?.point || '').replace(/\s+/g, ' ').trim().slice(0, 200),
+          positions: String(c?.positions || '').replace(/\s+/g, ' ').trim().slice(0, 400),
+        }))
+        .filter((c: { point: string; positions: string }) => c.point.length > 0 && c.positions.length > 0)
+        .slice(0, 6)
+    : [];
   return {
     indicators: out,
     indexNotes: { BAI: note(n.BAI), PSI: note(n.PSI), SCI: note(n.SCI), HII: note(n.HII) },
     interpretation: String(s.interpretation || '').replace(/\s+/g, ' ').trim().slice(0, 900),
     confidence: conf,
     claims,
+    contradictions,
   };
 }
 
@@ -478,6 +497,7 @@ function buildTwoPassArticle(
     tags: draft.tags,
     citations: citationsFrom(members),
     claims: scored?.claims ?? [],
+    contradictions: scored?.contradictions ?? [],
     indicators,
     totals: computeIndexTotals(indicators),
     interpretation,

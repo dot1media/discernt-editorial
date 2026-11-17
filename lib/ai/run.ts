@@ -30,15 +30,46 @@ function titleTokens(title: string): Set<string> {
     (title || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length >= 4 && !STOPWORDS.has(w)),
   );
 }
-function sameEvent(a: Set<string>, b: Set<string>): boolean {
+
+// Words that are capitalized constantly in this beat and so carry no
+// event-identifying signal; excluded from the "strong token" set below so two
+// unrelated faith stories are not merged merely for both naming God or church.
+const DOMAIN_COMMON = new Set(
+  ("god church christian christ jesus bible gospel faith lord pastor christians churches christianity biblical holy spirit catholic pope ministry ministries").split(" "),
+);
+/**
+ * Distinctive entities in a headline: proper nouns (capitalized, 3+ chars) and
+ * multi-digit numbers. Two headlines that share one of these are far more
+ * likely to be the same event than two that merely share common words, which
+ * lets the clusterer group differently-worded coverage without loosening the
+ * precision bar for everything.
+ */
+function strongTokens(title: string): Set<string> {
+  const out = new Set<string>();
+  for (const m of (title || "").matchAll(/\b\d{2,}\b/g)) out.add(m[0]);
+  for (const w of (title || "").split(/\s+/)) {
+    const bare = w.replace(/[^A-Za-z0-9]/g, "");
+    const low = bare.toLowerCase();
+    if (bare.length >= 3 && /^[A-Z]/.test(bare) && !STOPWORDS.has(low) && !DOMAIN_COMMON.has(low)) out.add(low);
+  }
+  return out;
+}
+
+function sameEvent(a: Set<string>, b: Set<string>, aStrong: Set<string>, bStrong: Set<string>): boolean {
   let inter = 0;
   for (const t of a) if (b.has(t)) inter++;
-  if (inter === 0) return false;
   const union = a.size + b.size - inter;
   const jaccard = union ? inter / union : 0;
   if (inter >= 3 || jaccard >= 0.34) return true;
   // Short headlines that share two distinctive words are likely the same event.
   if (inter >= 2 && Math.min(a.size, b.size) <= 4) return true;
+  // Entity-anchored: a shared distinctive proper noun or number plus modest
+  // content overlap catches the same event worded differently across outlets;
+  // two shared entities are strong enough on their own.
+  let sInter = 0;
+  for (const t of aStrong) if (bStrong.has(t)) sInter++;
+  if (sInter >= 2) return true;
+  if (sInter >= 1 && inter >= 2) return true;
   return false;
 }
 function sciScore(s: FeedSource): number {
@@ -255,16 +286,17 @@ export async function runGeneration(opts: { max?: number; only?: string } = {}):
   // Cluster candidates by event (by headline-token overlap). Newest items seed
   // first so a cluster forms around the freshest framing.
   candidates.sort((a, b) => (b.item.publishedAt?.getTime() || 0) - (a.item.publishedAt?.getTime() || 0));
-  interface Cluster { members: SourceMember[]; outlets: Set<string>; seed: Set<string> }
+  interface Cluster { members: SourceMember[]; outlets: Set<string>; seed: Set<string>; seedStrong: Set<string> }
   const clusters: Cluster[] = [];
   for (const c of candidates) {
     const tk = titleTokens(c.item.title);
     if (tk.size < 2) continue;
+    const strong = strongTokens(c.item.title);
     let placed = false;
     for (const cl of clusters) {
-      if (sameEvent(tk, cl.seed)) { cl.members.push(c); cl.outlets.add(c.source.name); placed = true; break; }
+      if (sameEvent(tk, cl.seed, strong, cl.seedStrong)) { cl.members.push(c); cl.outlets.add(c.source.name); placed = true; break; }
     }
-    if (!placed) clusters.push({ members: [c], outlets: new Set([c.source.name]), seed: tk });
+    if (!placed) clusters.push({ members: [c], outlets: new Set([c.source.name]), seed: tk, seedStrong: strong });
   }
 
   // A cluster's topic is its best outlet's category.

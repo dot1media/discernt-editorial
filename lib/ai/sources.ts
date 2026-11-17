@@ -81,6 +81,14 @@ export const DEFAULT_FEEDS: FeedSource[] = [
   // Additional reputable faith outlets
   { id: 'gospel-coalition', name: 'The Gospel Coalition', url: 'https://www.thegospelcoalition.org/feed/', category: 'culture', sciBaseline: { transparency: 2, trackRecord: 1, editorialStandards: 1 }, enabled: true },
   { id: 'christian-post', name: 'The Christian Post', url: 'https://www.christianpost.com/rss', category: 'faith', sciBaseline: { transparency: 2, trackRecord: 1, editorialStandards: 1 }, enabled: true },
+
+  // Wider lanes, so more beats have candidate events for the clusterer to work
+  // with (best-effort URLs on the standard WordPress /feed/ pattern; any that
+  // 404 are simply skipped at runtime, and the corroboration layer still
+  // reaches these outlets by search regardless).
+  { id: 'relevant', name: 'Relevant Magazine', url: 'https://relevantmagazine.com/feed/', category: 'culture', sciBaseline: { transparency: 1, trackRecord: 1, editorialStandards: 1 }, enabled: true },
+  { id: 'roys-report', name: 'The Roys Report', url: 'https://julieroys.com/feed/', category: 'faith', sciBaseline: { transparency: 2, trackRecord: 1, editorialStandards: 1 }, enabled: true },
+  { id: 'icc', name: 'International Christian Concern', url: 'https://www.persecution.org/feed/', category: 'world', sciBaseline: { transparency: 1, trackRecord: 1, editorialStandards: 1 }, enabled: true },
 ];
 
 /** Category → fallback hero image (matches the visual style already used in-app). */

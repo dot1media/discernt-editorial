@@ -61,6 +61,7 @@ export async function ensureSchema(): Promise<void> {
   await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS hero_image_credit TEXT DEFAULT ''`;
   await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS hero_image_rights_restricted BOOLEAN NOT NULL DEFAULT false`;
   await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS hero_image_illustrative BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS hero_image_alt TEXT DEFAULT ''`;
   await sql`ALTER TABLE stories ADD COLUMN IF NOT EXISTS citations JSONB`;
 
   // Sources attached to a story.

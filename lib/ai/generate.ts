@@ -131,6 +131,8 @@ export interface GeneratedArticle {
   // True when `image` is a sourced stock/CC illustration rather than the outlet's
   // own photograph of the event, so the reader can be shown an "Illustration" label.
   imageIllustrative: boolean;
+  // Plain-language description of the hero image, for screen-reader alt text.
+  imageAlt: string;
   tags: string[];
   citations: string; // JSON array [{title,url,source}]
   editorNote: string; // reader-facing: why this story earned a place today
@@ -244,6 +246,7 @@ function buildTemplateArticle(members: SourceMember[]): GeneratedArticle {
     // Outlet's own photo → real; a category fallback is a generic illustration,
     // so it is labelled as one rather than passing as a photo of the event.
     imageIllustrative: !item.imageUrl,
+    imageAlt: humanizeProse(item.title),
     tags: [source.category, 'curated'],
     citations: citationsFrom(members),
     editorNote: '',
@@ -300,6 +303,9 @@ interface WriterOutput {
   // outlet carried no photo of its own. Two to five words naming a thing that
   // can actually be photographed, not an abstraction.
   imageQuery: string;
+  // A plain-language description of what an image for this story would show, for
+  // screen-reader alt text.
+  imageAlt: string;
 }
 
 interface ScorerOutput {
@@ -379,7 +385,8 @@ OUTPUT, ONLY a JSON object, no fences, no preamble:
   "body": "the full brief in clean prose, no markdown, no asterisks, no em-dashes, ending with the Through the Lens section",
   "tags": ["3-5", "lowercase", "tags"],
   "editorNote": "ONE plain sentence, max 160 chars, addressed to the reader: why this story earned a place in today's edition. Name the turning it serves. No hype, no marketing, no restating the headline, no em-dashes.",
-  "imageQuery": "2 to 5 words naming the single most central, concrete, photographable subject of THIS story, for finding a stock illustration. Name a specific thing a camera could capture (a place, object, building, setting), not an abstract theme. Prefer the proper place or thing over a generic word. Example: for a story on an Alaska pipeline restart, 'Alaska oil pipeline', not 'energy policy'."
+  "imageQuery": "2 to 5 words naming the single most central, concrete, photographable subject of THIS story, for finding a stock illustration. Name a specific thing a camera could capture (a place, object, building, setting), not an abstract theme. Prefer the proper place or thing over a generic word. Example: for a story on an Alaska pipeline restart, 'Alaska oil pipeline', not 'energy policy'.",
+  "imageAlt": "a plain, factual description (max 120 chars) of what a photo illustrating this story would show, for screen-reader alt text. Describe the visible scene, not the news. No 'image of' or 'photo of' prefix. Example: 'A section of elevated oil pipeline crossing open tundra.'"
 }`;
 }
 
@@ -485,6 +492,7 @@ function validateWriter(w: any): WriterOutput | null {
     tags: Array.isArray(w.tags) ? w.tags.slice(0, 6).map((t: any) => String(t).toLowerCase().slice(0, 30)) : ['news'],
     editorNote: typeof w.editorNote === 'string' ? w.editorNote.trim().slice(0, 200) : '',
     imageQuery: typeof w.imageQuery === 'string' ? w.imageQuery.trim().slice(0, 80) : '',
+    imageAlt: typeof w.imageAlt === 'string' ? w.imageAlt.replace(/\s+/g, ' ').trim().slice(0, 160) : '',
   };
 }
 
@@ -579,6 +587,7 @@ function buildTwoPassArticle(
     // Outlet's own photo → real; a category fallback is a generic illustration,
     // so it is labelled as one rather than passing as a photo of the event.
     imageIllustrative: !item.imageUrl,
+    imageAlt: humanizeProse(draft.imageAlt) || humanizeProse(draft.title),
     tags: draft.tags,
     citations: citationsFrom(members),
     claims: scored?.claims ?? [],
@@ -660,6 +669,9 @@ export async function generateArticle(
         article.image = sourced.url;
         article.imageCredit = sourced.credit;
         article.imageIllustrative = true;
+        // The sourced image's own title is a real description of what it depicts,
+        // so it is the most accurate alt text for the picture actually shown.
+        if (sourced.alt) article.imageAlt = sourced.alt;
       }
     } catch {}
   }

@@ -8,6 +8,8 @@
 export interface SourcedImage {
   url: string;
   credit: string;
+  /** The image's own title — a real description of what it depicts, for alt text. */
+  alt: string;
 }
 
 // Very common words carry no visual meaning, so they never count toward a match.
@@ -109,7 +111,8 @@ export async function searchOpenverseImage(query: string, timeoutMs = 4500): Pro
     const license = (pick.license || '').toString().toUpperCase();
     const ver = pick.license_version ? ' ' + pick.license_version : '';
     const credit = `${creator} / ${via}${license ? ` (${license}${ver})` : ''}`.slice(0, 300);
-    return { url: String(pick.url), credit };
+    const alt = String(pick.title || q).replace(/\s+/g, ' ').trim().slice(0, 160);
+    return { url: String(pick.url), credit, alt };
   } catch {
     return null;
   } finally {

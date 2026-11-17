@@ -7,6 +7,7 @@ import { fetchFeed, type FeedItem } from "@/lib/ai/rss";
 import { generateArticle, type GeneratedArticle, type SourceMember } from "@/lib/ai/generate";
 import { youTubeToSourceItem } from "@/lib/ai/youtube";
 import { getTopicPrefs } from "@/lib/ai/topics";
+import { corroborate } from "@/lib/ai/corroborate";
 
 const NEWS_CATEGORIES: NewsCategory[] = ["world", "politics", "faith", "culture", "technology", "health", "business", "environment"];
 
@@ -143,13 +144,19 @@ const clip = (s: string, n: number) => (s && s.length > n ? s.slice(0, n - 1) + 
 async function seedDossier(storyId: string, article: GeneratedArticle, members: SourceMember[]): Promise<void> {
   const outletNames = members.map((m) => m.source.name).join(", ");
 
-  // 1) Every cited outlet as its own source row.
+  // 1) Every cited outlet as its own source row. Outlets added by active
+  //    corroboration (news search) are labelled as such so the editor knows to
+  //    confirm them against the outlet's own report, not the aggregator link.
   for (const { item, source } of members) {
     const b = source.sciBaseline;
+    const viaSearch = source.id.startsWith("corr-");
+    const srcNote = viaSearch
+      ? `Corroborating coverage found via news search. Confirm against ${source.name}'s own report before relying on it: ${item.link}`
+      : `Outlet reporting this event. Original report: ${item.link}${item.description ? `. ${item.description}` : ""}`;
     await sql`INSERT INTO story_sources (id, story_id, name, organization, title, contact, source_type, attribution, response_status, notes, reliability_notes, added_by, date_contacted)
       VALUES (${newId("src")}, ${storyId}, ${source.name}, ${source.name}, ${""}, ${""},
         ${"secondary_reporting"}, ${"on_record"}, ${"pending"},
-        ${clip(`Outlet reporting this event. Original report: ${item.link}${item.description ? ` — ${item.description}` : ""}`, 600)},
+        ${clip(srcNote, 600)},
         ${`Registry SCI baseline for ${source.name}: transparency ${b.transparency}/2, track record ${b.trackRecord}/2, editorial standards ${b.editorialStandards}/2.`},
         ${"ai-desk"}, ${null})`;
   }
@@ -164,8 +171,11 @@ async function seedDossier(storyId: string, article: GeneratedArticle, members: 
   }
 
   // 3) A provenance entry in the reporting log.
+  const corroborated = members.filter((m) => m.source.id.startsWith("corr-")).length;
   const logEntry = clip(
-    `AI Desk synthesized this draft from ${members.length} outlet${members.length > 1 ? "s" : ""} (${outletNames}) via the two-pass writer and independent D1-4LS scorer. ` +
+    `AI Desk synthesized this draft from ${members.length} outlet${members.length > 1 ? "s" : ""} (${outletNames})` +
+      (corroborated ? `, of which ${corroborated} ${corroborated > 1 ? "were" : "was"} added by active corroboration (news search)` : "") +
+      ` via the two-pass writer and independent D1-4LS scorer. ` +
       `Score confidence: ${article.scoreConfidence}. Sources, evidence, and candidate claims are auto-seeded; verification is pending editorial review.`,
     800,
   );
@@ -300,9 +310,24 @@ export async function runGeneration(opts: { max?: number; only?: string } = {}):
       for (const m of perOutlet) { if (await alreadySeen(m.item)) { seen = true; break; } }
       if (seen) { result.skipped += 1; continue; }
 
-      const [primary, ...related] = perOutlet;
+      // Active corroboration: an under-sourced event is topped up with other
+      // outlets covering it (see corroborate.ts), so the desk writes from
+      // several outlets rather than one. Best-effort: on any failure the story
+      // is still written from the outlets we already have.
+      let members = perOutlet;
+      if (members.length < MIN_SOURCES) {
+        try {
+          const have = new Set(members.map((m) => m.source.name));
+          const extra = await corroborate(members[0], have, { want: MIN_SOURCES - members.length });
+          if (extra.length) members = [...members, ...extra];
+        } catch (e: any) {
+          result.errors.push(`corroborate "${perOutlet[0]?.item.title?.slice(0, 40)}": ${e?.message || e}`);
+        }
+      }
+
+      const [primary, ...related] = members;
       const article = await generateArticle(primary.item, primary.source, 80000, related);
-      const id = await insertDraft(article, perOutlet);
+      const id = await insertDraft(article, members);
       result.generated += 1;
       result.drafts.push({ id, headline: article.title, source: `${primary.source.name} +${related.length} more` });
     } catch (e: any) {

@@ -28,7 +28,7 @@ export interface MediaCandidate {
   durationSeconds: number | null;
 }
 
-const UA = 'Dot1News-ContentPipeline/1.0 (+https://dot1.media)';
+const UA = 'Discernt-ContentPipeline/1.0 (+https://dot1.media)';
 
 async function getJson(url: string, timeoutMs: number, headers?: Record<string, string>): Promise<any | null> {
   const controller = new AbortController();

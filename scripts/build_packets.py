@@ -62,13 +62,13 @@ class Packet(BaseDocTemplate):
         c.setFillColor(MUTED); c.setFont("Courier", 7); c.drawRightString(W - 64, H - 46, self.label)
         c.setStrokeColor(HAIR); c.setLineWidth(0.6); c.line(64, H - 54, W - 64, H - 54); c.line(64, 48, W - 64, 48)
         c.setFillColor(MUTED); c.setFont("Courier", 7)
-        c.drawString(64, 38, "A Declared Standpoint"); c.drawRightString(W - 64, 38, "Page %d" % d.page)
+        c.drawString(64, 38, "Interpreting the Times"); c.drawRightString(W - 64, 38, "Page %d" % d.page)
 
 def cover(title, sub):
     return [Spacer(1, 250), Paragraph("DOT ONE MEDIA", sty["cover_t"]), SP(8),
             Paragraph(title, ParagraphStyle("ct2", parent=sty["cover_t"], fontSize=20, textColor=GOLD)), SP(16),
             Paragraph(sub, sty["cover_s"]), Spacer(1, 120),
-            Paragraph("A DECLARED STANDPOINT", sty["cover_m"]),
+            Paragraph("INTERPRETING THE TIMES", sty["cover_m"]),
             Paragraph("Confidential · for Dot One Media staff", sty["cover_m"]),
             NextPageTemplate("normal"), PageBreak()]
 
@@ -122,7 +122,7 @@ def build_studio():
 # ============================ REPORTER ============================
 def build_reporter():
     s = cover("Reporter Packet", "Writing and verifying the news, to standard")
-    s += [KICK("YOUR ROLE"), H1("Reporting for Dot 1 News")]
+    s += [KICK("YOUR ROLE"), H1("Reporting for Discernt")]
     s += [P("You create and work stories — the reporting, the record behind it, and the verification. You do not publish; an editor approves and publishes. Our standard is <b>Just Truth, No Bias</b>, and the system enforces it: a story can't skip verification.")]
     s += [H2("Signing in")]
     s += [P("The newsroom has its own login at <b>editorial.dot1.media</b> (separate from the studio sign-in). An Owner sets up your account and your Reporter role.")]
@@ -229,7 +229,7 @@ def build_dayone():
               "portal.dot1.media — client jobs (studio + clients).",
               "assets.dot1.media — gear and lifecycle.",
               "editorial.dot1.media — the newsroom.",
-              "news.dot1.media + the Dot 1 News app — what readers see."]:
+              "discernt.dot1.media + the Discernt app — what readers see."]:
         s += [checkrow(t)]
     s += [H2("Understand how we work")]
     for t in ["Access is by role — you'll see only what your role allows.",

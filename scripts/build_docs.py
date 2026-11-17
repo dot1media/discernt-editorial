@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Build the printable Dot 1 News handouts into public/docs so they're always
+"""Build the printable Discernt handouts into public/docs so they're always
 current and downloadable from the portal. Regenerate on every docs push:
 
     python3 scripts/build_docs.py
 
 Outputs:
-    public/docs/Dot1News-Newsroom-QuickStart.pdf
-    public/docs/Dot1News-Broadcast-Guide.pdf
+    public/docs/Discernt-Newsroom-QuickStart.pdf
+    public/docs/Discernt-Broadcast-Guide.pdf
 """
 import os
 from reportlab.pdfgen import canvas
@@ -14,7 +14,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.colors import HexColor
 
 W, H = letter
-CRIMSON = HexColor("#b81616"); DEEP = HexColor("#8f1111")
+CRIMSON = HexColor("#8A6A17"); DEEP = HexColor("#6E5415")
 GOLD = HexColor("#c8a24a"); INK = HexColor("#141210")
 BONE = HexColor("#f4f0e7"); PAPER = HexColor("#fbf8f2"); MUTED = HexColor("#6b6459")
 BLUE = HexColor("#3a6ea5"); GREEN = HexColor("#2f8f6b")
@@ -56,13 +56,13 @@ class Doc:
         c = self.c
         c.setFillColor(INK); c.rect(0, H - 92, W, 92, fill=1, stroke=0)
         c.setFillColor(CRIMSON); c.rect(0, H - 96, W, 4, fill=1, stroke=0)
-        self.txt(54, H - 46, "DOT 1 NEWS", 22, "Times-Bold", BONE)
+        self.txt(54, H - 46, "DISCERNT", 22, "Times-Bold", BONE)
         self.txt(56, H - 62, "JUST TRUTH  \u00b7  NO BIAS", 8, "Courier", GOLD)
         self.txt(W - 54, H - 44, deck, 15, "Times-Bold", BONE, right=True)
         self.txt(W - 54, H - 60, sub, 8.5, "Helvetica", HexColor("#cfc8ba"), right=True)
 
     def footer(self):
-        self.txt(54, 40, "Dot 1 News \u00b7 A Declared Standpoint", 7.5, "Courier", MUTED)
+        self.txt(54, 40, "Discernt \u00b7 Interpreting the Times", 7.5, "Courier", MUTED)
         self.txt(W - 54, 40, "Full guide: editorial.dot1.media \u2192 Guide", 7.5, "Courier", MUTED, right=True)
 
     def kicker(self, x, y, s):
@@ -96,11 +96,11 @@ OWN = ("Owner", GOLD); ED = ("Editor", CRIMSON); REP = ("Reporter", BLUE); PRO =
 
 # ============================================================ QUICK START
 def build_quickstart():
-    d = Doc(os.path.join(OUT, "Dot1News-Newsroom-QuickStart.pdf"), "Dot 1 News \u2014 Newsroom Quick Start")
+    d = Doc(os.path.join(OUT, "Discernt-Newsroom-QuickStart.pdf"), "Discernt \u2014 Newsroom Quick Start")
     d.header("Newsroom Quick Start", "How content reaches readers")
     y = H - 150; d.kicker(54, y + 34, "THE FLOW")
     steps = [("Where it starts", ["Reporter", "AI Desk", "Tip"]), ("Review", ["claims", "checklist", "editor OK"]),
-             ("Dual-rate", ["AI + human", "score"]), ("Publish", ["to news DB"]), ("Readers", ["news.dot1.media", "the app"])]
+             ("Dual-rate", ["AI + human", "score"]), ("Publish", ["to news DB"]), ("Readers", ["discernt.dot1.media", "the app"])]
     bw, gap, x = 92, 21, 54
     for i, (label, lines) in enumerate(steps):
         last = i == 4
@@ -164,7 +164,7 @@ def build_quickstart():
 
 # ============================================================ BROADCAST GUIDE
 def build_broadcast():
-    d = Doc(os.path.join(OUT, "Dot1News-Broadcast-Guide.pdf"), "Dot 1 News \u2014 Live Broadcast Guide")
+    d = Doc(os.path.join(OUT, "Discernt-Broadcast-Guide.pdf"), "Discernt \u2014 Live Broadcast Guide")
 
     # ---- Page 1: signal flow ----
     d.header("Live Broadcast Guide", "ATEM + OBS + Editorial \u2014 setup & run")
@@ -196,7 +196,7 @@ def build_broadcast():
     d.rows(54, y - 8, W - 108, [
         ("The cameras (C50 / C400)", "Send a clean 1080p picture over HDMI into the switcher.", None),
         ("The ATEM Mini Pro ISO", "Switches cameras and mixes audio; one feed to the computer over USB-C.", None),
-        ("OBS", "Takes the ATEM feed, lays Dot 1 News graphics on top, records/streams \u2014 16:9 and 9:16.", None),
+        ("OBS", "Takes the ATEM feed, lays Discernt graphics on top, records/streams \u2014 16:9 and 9:16.", None),
         ("The editorial portal", "Where a producer drives lower thirds, bug, ticker/strap, and breaking \u2014 live, for both.", None),
     ], rh=30, box=24)
     d.footer(); d.c.showPage()
@@ -323,7 +323,7 @@ def build_broadcast():
     d.header("Live Broadcast Guide", "Going live \u00b7 Cloudflare Stream")
     y = H - 138
     d.rrect(54, y - 6, W - 108, 30, 6, fill=HexColor("#f6efe0"), stroke=GOLD, sw=1)
-    d.txt(64, y + 10, "Live streams to news.dot1.media and the app through Cloudflare Stream.", 9, "Helvetica-Bold", DEEP)
+    d.txt(64, y + 10, "Live streams to discernt.dot1.media and the app through Cloudflare Stream.", 9, "Helvetica-Bold", DEEP)
     d.txt(64, y - 2, "You control it from the portal: Broadcast \u2192 Go live. The recording is kept automatically.", 8.4, "Helvetica", INK)
     y -= 44
     d.kicker(54, y, "ONE-TIME SETUP"); y -= 18

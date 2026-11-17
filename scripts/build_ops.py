@@ -38,10 +38,10 @@ def build_handoff():
           B("<b>Websites</b> are hosted on <b>Vercel</b> — each repo is a Vercel project that <b>auto-deploys when you push to <font face='Courier'>main</font></b>."),
           B("<b>Databases</b> are <b>Neon</b> Postgres — one per app (editorial, news, portal, assets)."),
           B("<b>Video</b> (live + recorded) is <b>Cloudflare Stream</b>; <b>photo galleries</b> are <b>CloudSpot</b>; <b>email</b> is <b>Resend</b>; <b>client payments</b> are <b>Square</b>."),
-          B("<b>The app</b> (Dot 1 News, App Store) is built with Expo/EAS; native builds go through the ship flow, small changes ship over-the-air.")]
+          B("<b>The app</b> (Discernt, App Store) is built with Expo/EAS; native builds go through the ship flow, small changes ship over-the-air.")]
     s += [H2("System by system")]
     s += [P("<b>Editorial — the newsroom</b> (dot-1-editorial → editorial.dot1.media). Next.js on Vercel with its own Neon database; it also reads the news database to publish. Runs the AI pipeline and the broadcast graphics/live control. Broadcast overlays are static files in <font face='Courier'>public/broadcast</font>. Deploy by pushing to main. Config you'll see: the two database URLs, the Cloudflare Stream settings (account id, stream token, customer-code), a cron secret, and the AI generation key.")]
-    s += [P("<b>News — reader app + site</b> (dot-1-news → news.dot1.media + the App Store app). An Expo/React-Native app plus a Hono/tRPC backend; the website is served by the backend. The <b>website</b> deploys by pushing to main (Vercel). The <b>app</b> is built with EAS through the ship script and updated over-the-air with <font face='Courier'>eas update</font>. Admin uses two-factor. Config: its database URL, an admin API key, and the editorial base URL it reads policy from.")]
+    s += [P("<b>News — reader app + site</b> (dot-1-news → discernt.dot1.media + the App Store app). An Expo/React-Native app plus a Hono/tRPC backend; the website is served by the backend. The <b>website</b> deploys by pushing to main (Vercel). The <b>app</b> is built with EAS through the ship script and updated over-the-air with <font face='Courier'>eas update</font>. Admin uses two-factor. Config: its database URL, an admin API key, and the editorial base URL it reads policy from.")]
     s += [P("<b>Client portal</b> (dot-1-portal → portal.dot1.media). Next.js on Vercel with its own Neon database; Square payments, Resend email, PDF receipts/invoices. It is also the <b>identity hub</b> for staff sign-in. Deploy by pushing to main. Config: database URL, the session secret, Square keys + webhook signing key, the email sender, the Google review link, and the assets database URL (for gear-package dropdowns).")]
     s += [P("<b>Asset system</b> (dot-1-assets → assets.dot1.media). Next.js on Vercel with its own Neon database. It trusts the portal's sign-in (shared cookie), so its session secret must match the portal's. Deploy by pushing to main. Config: database URL, the session secret (same value as the portal), and an optional setup code.")]
     s += [P("<b>Company website</b> (dot-1-site → dot1.media). Static HTML on Vercel; no database, no login. It also <b>hosts the agreement PDFs</b> (Client Services Agreement, Release & Waiver, Minor Release). Deploy by pushing to main.")]
@@ -106,7 +106,7 @@ def build_renewals():
     s += [P("These are the recurring renewals that, if missed, take something down. Put each one — with its exact date — into a real calendar with reminders a month ahead. Fill the <b>Next due</b> column as you confirm each date.")]
     s += [H2("Critical — missing these takes systems down")]
     s += [kv_table([
-        ("Apple Developer Program", "Yearly (~$99). If it lapses, the Dot 1 News app is removed from the App Store. Renew at developer.apple.com. Next due: ____"),
+        ("Apple Developer Program", "Yearly (~$99). If it lapses, the Discernt app is removed from the App Store. Renew at developer.apple.com. Next due: ____"),
         ("Domain registrations", "Yearly (or multi-year). If a domain lapses, that site goes dark. Renew at your registrar. Next due: ____"),
         ("Google Workspace / @dot1.media", "Monthly or yearly. Staff email AND the staff logins depend on the domain/email — losing it breaks sign-in across the suite. Next due: ____"),
         ("SAM.gov registration", "Yearly. If it lapses you can't be awarded or keep federal contracts. Renew at sam.gov. Next due: ____"),
@@ -137,7 +137,7 @@ def build_hiring():
           B("<b>A studio associate / second shooter</b> — to help the Creative Director on photo/video volume."),
           B("<b>Later: social &amp; audience</b> — to work the notifications and analytics once people are coming in.")]
     s += [box([NOTE("Whether these are employees or contractors, and how they're paid, are decisions for an accountant/attorney — especially with government work in the mix. Treat the descriptions below as drafts to adapt, not legal templates.")])]
-    s += [H2("Role: Reporter (Dot 1 News)")]
+    s += [H2("Role: Reporter (Discernt)")]
     s += [B("<b>Does</b>: researches and writes stories; builds the record (sources, evidence, a reporting log); works verification; adds a rating."),
           B("<b>Doesn't</b>: publish — an editor approves and publishes."),
           B("<b>Works in</b>: the editorial portal, Reporter role."),

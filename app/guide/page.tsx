@@ -272,8 +272,8 @@ export default function GuidePage() {
           </div>
           <div style={{ marginTop: 10, marginBottom: 6, fontSize: 14 }}>Newsroom &amp; broadcast quick guides:</div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <a className="btn ghost sm" href="/docs/Dot1News-Newsroom-QuickStart.pdf" target="_blank" rel="noreferrer">Newsroom Quick Start</a>
-            <a className="btn ghost sm" href="/docs/Dot1News-Broadcast-Guide.pdf" target="_blank" rel="noreferrer">Live Broadcast Guide</a>
+            <a className="btn ghost sm" href="/docs/Discernt-Newsroom-QuickStart.pdf" target="_blank" rel="noreferrer">Newsroom Quick Start</a>
+            <a className="btn ghost sm" href="/docs/Discernt-Broadcast-Guide.pdf" target="_blank" rel="noreferrer">Live Broadcast Guide</a>
           </div>
         </Section>
 

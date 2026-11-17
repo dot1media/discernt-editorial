@@ -147,7 +147,7 @@ export async function fetchFeed(url: string, timeoutMs = 12000): Promise<FeedIte
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Dot1News-ContentPipeline/1.0 (+https://dot1.media)',
+        'User-Agent': 'Discernt-ContentPipeline/1.0 (+https://dot1.media)',
         'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*',
       },
     });
@@ -179,7 +179,7 @@ export async function fetchOgImage(pageUrl: string, timeoutMs = 4000): Promise<s
       signal: controller.signal,
       redirect: 'follow',
       headers: {
-        'User-Agent': 'Dot1News-ContentPipeline/1.0 (+https://dot1.media)',
+        'User-Agent': 'Discernt-ContentPipeline/1.0 (+https://dot1.media)',
         'Accept': 'text/html',
       },
     });

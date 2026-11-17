@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Build the Dot 1 News Operations Manual — the full training manual for staff.
-Regenerated with the other handouts. Output: public/docs/Dot1News-Operations-Manual.pdf
+"""Build the Discernt Operations Manual — the full training manual for staff.
+Regenerated with the other handouts. Output: public/docs/Dot1Media-Employee-Handbook.pdf
 """
 import os
 from reportlab.lib.pagesizes import letter
@@ -68,7 +68,7 @@ class Manual(BaseDocTemplate):
         c.setStrokeColor(HAIR); c.setLineWidth(0.6); c.line(64, letter[1] - 54, letter[0] - 64, letter[1] - 54)
         c.setStrokeColor(HAIR); c.line(64, 48, letter[0] - 64, 48)
         c.setFillColor(MUTED); c.setFont("Courier", 7)
-        c.drawString(64, 38, "A Declared Standpoint")
+        c.drawString(64, 38, "Interpreting the Times")
         c.drawRightString(letter[0] - 64, 38, "Page %d" % d.page)
 
     def afterFlowable(self, flowable):
@@ -111,7 +111,7 @@ story += [Spacer(1, 240),
           Spacer(1, 18),
           Paragraph("How we run the studio, the client portal, the<br/>asset system, the websites, and the newsroom", st["cover_s"]),
           Spacer(1, 120),
-          Paragraph("A DECLARED STANDPOINT", st["cover_m"]),
+          Paragraph("INTERPRETING THE TIMES", st["cover_m"]),
           Paragraph("Veteran-owned · Wasilla, Alaska", st["cover_m"]),
           Spacer(1, 8),
           Paragraph("Confidential · for Dot One Media staff", st["cover_m"]),
@@ -124,8 +124,8 @@ story += [KICK("CONTENTS"), Paragraph("What's in this handbook", ParagraphStyle(
 
 # ===== 1. WELCOME =====
 story += [KICK("SECTION 1"), H1("Welcome to Dot One Media")]
-story += [P("This handbook is how we run everything. It covers every system we use — the company website, the client portal, the asset system, and the entire Dot 1 News newsroom and broadcast — plus the day-to-day procedures and the permissions that decide who does what. If you're new, read it once front to back, then use the contents and the runbooks in Section 14 as your daily reference. Several systems also have their own in-app guides; this handbook is the master that ties them together.")]
-story += [P("Our posture is <b>A Declared Standpoint</b>: we're open about who we are and we do the work to a documented standard. For the newsroom that standard is <b>Just Truth, No Bias</b>. The tools in this handbook exist to make that standard repeatable.")]
+story += [P("This handbook is how we run everything. It covers every system we use — the company website, the client portal, the asset system, and the entire Discernt newsroom and broadcast — plus the day-to-day procedures and the permissions that decide who does what. If you're new, read it once front to back, then use the contents and the runbooks in Section 14 as your daily reference. Several systems also have their own in-app guides; this handbook is the master that ties them together.")]
+story += [P("Our posture is plain and declared: we're open about who we are and we do the work to a documented standard. For the newsroom that standard is <b>Just Truth, No Bias</b>. The tools in this handbook exist to make that standard repeatable.")]
 story += [box([NOTE("If a page or button described here isn't visible to you, it's gated to a role you don't have. That's expected — ask an Owner or the studio.")])]
 
 # ===== 2. THE COMPANY =====
@@ -136,8 +136,8 @@ story += [B("<b>Photography</b> — led by the Creative Director; our current gr
           B("<b>Video &amp; film</b> — from short pieces to documentary and commercial work."),
           B("<b>Music</b> — production and related services."),
           B("<b>Government &amp; commercial</b> — we are SAM.gov registered (UEI R3MTPRVZ9L42, CAGE 22YZ5); FAA Part 107 remote-pilot certification is in progress."),
-          B("<b>Dot 1 News</b> — our independent news outlet: a newsroom, a reader app and website, and a broadcast studio.")]
-story += [P("Client work (photo, video, music, government) is run through the <b>client portal</b>. The newsroom and broadcast run through the <b>Dot 1 News</b> systems. The <b>asset system</b> tracks the gear all of it depends on.")]
+          B("<b>Discernt</b> — our independent news outlet: a newsroom, a reader app and website, and a broadcast studio.")]
+story += [P("Client work (photo, video, music, government) is run through the <b>client portal</b>. The newsroom and broadcast run through the <b>Discernt</b> systems. The <b>asset system</b> tracks the gear all of it depends on.")]
 
 # ===== 3. ECOSYSTEM =====
 story += [PageBreak(), KICK("SECTION 3"), H1("The whole ecosystem at a glance")]
@@ -148,8 +148,8 @@ sysrows = [
     [Paragraph("Client portal", st["tbl"]), Paragraph("portal.dot1.media", st["tbl"]), Paragraph("Clients + studio. Booking, payments, the session status timeline, delivery.", st["tbl"])],
     [Paragraph("Asset system", st["tbl"]), Paragraph("assets.dot1.media", st["tbl"]), Paragraph("Studio. Equipment/software/service inventory, lifecycle, gear packages, check-out.", st["tbl"])],
     [Paragraph("Editorial portal", st["tbl"]), Paragraph("editorial.dot1.media", st["tbl"]), Paragraph("Newsroom staff. Write, verify, score, publish; run broadcast and live.", st["tbl"])],
-    [Paragraph("News website", st["tbl"]), Paragraph("news.dot1.media", st["tbl"]), Paragraph("Public. Stories, live page, standpoint pages, news-tip form.", st["tbl"])],
-    [Paragraph("Reader app", st["tbl"]), Paragraph("Dot 1 News (App Store)", st["tbl"]), Paragraph("Public iOS/Android app. Reading, live banner, videos, notifications.", st["tbl"])],
+    [Paragraph("News website", st["tbl"]), Paragraph("discernt.dot1.media", st["tbl"]), Paragraph("Public. Stories, live page, standpoint pages, news-tip form.", st["tbl"])],
+    [Paragraph("Reader app", st["tbl"]), Paragraph("Discernt (App Store)", st["tbl"]), Paragraph("Public iOS/Android app. Reading, live banner, videos, notifications.", st["tbl"])],
     [Paragraph("Broadcast overlays", st["tbl"]), Paragraph("editorial.dot1.media/broadcast/…", st["tbl"]), Paragraph("The on-air graphics OBS loads (16:9 and 9:16).", st["tbl"])],
 ]
 t = Table(sysrows, colWidths=[92, 140, 248])
@@ -176,10 +176,10 @@ story += [P("dot1.media is our public front door — a marketing site, not somet
 story += [B("<b>Services</b> — photography, video, music, and government &amp; commercial work."),
           B("<b>Methodology</b> — how we approach the work, including our editorial methodology."),
           B("<b>Government &amp; commercial</b> — our SAM.gov registration (UEI R3MTPRVZ9L42, CAGE 22YZ5) and certifications."),
-          B("<b>Dot 1 News</b> — a section introducing the news outlet."),
+          B("<b>Discernt</b> — a section introducing the news outlet."),
           B("<b>Agreements</b> — the Client Services Agreement, Release &amp; Waiver, and Minor Release PDFs are hosted here."),
           B("<b>Submit a news tip</b> — a button that feeds the newsroom's tips queue."),
-          B("Footer links to both Instagram handles (@dot1media, @dot1photo) and the Dot 1 News app.")]
+          B("Footer links to both Instagram handles (@dot1media, @dot1photo) and the Discernt app.")]
 story += [NOTE("Booking a client session is moving into the client portal; where the site still points to older scheduling, prefer the portal. Photography is shown as a single collage grid by the Creative Director's choice.")]
 
 # ===== 6. CLIENT PORTAL — STUDIO =====
@@ -255,7 +255,7 @@ story += [NOTE("This gives you a live picture of where gear is, prevents double-
 
 # ===== 10. NEWSROOM =====
 story += [PageBreak(), KICK("SECTION 10"), H1("The newsroom (editorial portal)")]
-story += [P("editorial.dot1.media is where all Dot 1 News journalism happens. Newsroom access is by <b>role</b>, and roles are made of individual capabilities an Owner can grant one at a time.")]
+story += [P("editorial.dot1.media is where all Discernt journalism happens. Newsroom access is by <b>role</b>, and roles are made of individual capabilities an Owner can grant one at a time.")]
 story += [H2("10.1 Roles")]
 story += [B("<b>Reporter</b> — creates and works stories (sources, evidence, reporting log, verification, ratings). Cannot publish."),
           B("<b>Editor</b> — a Reporter plus assigning/moving stories, approving, publishing, corrections, standards, and the audit log."),
@@ -296,8 +296,8 @@ story += [B("<b>Published archive</b> — everything live (articles, photos, vid
 
 # ===== 11. READERS =====
 story += [PageBreak(), KICK("SECTION 11"), H1("What readers see (app & news site)")]
-story += [B("<b>The reader app (Dot 1 News)</b> — public and reader-only: latest stories, a red LIVE banner when we're broadcasting, a videos area for episodes, and push notifications. No staff functions live in the app."),
-          B("<b>news.dot1.media</b> — the reader website with the same stories, the standpoint pages (standards, corrections, ownership, advertising, contact), a /live page, and a Send a news tip page."),
+story += [B("<b>The reader app (Discernt)</b> — public and reader-only: latest stories, a red LIVE banner when we're broadcasting, a videos area for episodes, and push notifications. No staff functions live in the app."),
+          B("<b>discernt.dot1.media</b> — the reader website with the same stories, the standpoint pages (standards, corrections, ownership, advertising, contact), a /live page, and a Send a news tip page."),
           B("<b>Tips</b> from the app and both websites all land in the newsroom's Tips queue; some are anonymous — protect confidentiality.")]
 
 # ===== 12. BROADCAST =====
@@ -411,7 +411,7 @@ gloss = [
     ("Bug", "The small on-screen logo/identifier during a broadcast."),
     ("Check-out / check-in", "Taking a gear package out for a shoot and returning it, tracked in the asset system."),
     ("CloudSpot", "The studio's photo gallery/delivery tool; the portal links out to its galleries."),
-    ("D1-4LS", "Dot 1 News's rating framework; stories are dual-rated against it."),
+    ("D1-4LS", "Discernt's rating framework; stories are dual-rated against it."),
     ("Dual rating", "A machine rating plus an independent human second rating, reconciled."),
     ("Internal booking", "A studio-only session created without a client portal account (email only)."),
     ("Invoice", "A bill sent to a client that doubles as a booking once the retainer is paid."),
@@ -429,7 +429,7 @@ gloss = [
 for term, d in gloss:
     story += [Paragraph(f"<b>{term}</b> — {d}", ParagraphStyle("gl", parent=st["body"], leftIndent=12, firstLineIndent=-12, spaceAfter=5))]
 
-story += [SP(14), box([Paragraph("Dot One Media · A Declared Standpoint", ParagraphStyle("end", parent=st["body"], alignment=TA_CENTER, textColor=DEEP)),
+story += [SP(14), box([Paragraph("Dot One Media · Interpreting the Times", ParagraphStyle("end", parent=st["body"], alignment=TA_CENTER, textColor=DEEP)),
     Paragraph("This handbook is regenerated as the systems change. Each portal also has its own in-app guide with the finest detail.", ParagraphStyle("end2", parent=st["body"], alignment=TA_CENTER, fontSize=8, textColor=MUTED))], bg=HexColor("#f6efe0"), stroke=GOLD)]
 
 def build():

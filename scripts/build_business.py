@@ -48,7 +48,7 @@ def build_capability():
             Paragraph("Representative work", ctitle),
             bullet("Military ceremony photography"),
             bullet("Historical films for an Alaska veterans museum"),
-            bullet("Built and operate Dot 1 News — an iOS/Android news app, website, and broadcast")]
+            bullet("Built and operate Discernt — an iOS/Android news app, website, and broadcast")]
 
     # Right column — company data box
     def row(k, v): return [Paragraph(k, lab), Paragraph(v, val)]
@@ -84,7 +84,7 @@ def build_capability():
         ("TOPPADDING", (0, 0), (-1, -1), 0), ("BOTTOMPADDING", (0, 0), (-1, -1), 0)]))
 
     story = [header, SP(14), cols, SP(12),
-             Table([[Paragraph("Just Truth, No Bias · A Declared Standpoint · Veteran-Owned · Wasilla, Alaska",
+             Table([[Paragraph("Just Truth, No Bias · Interpreting the Times · Veteran-Owned · Wasilla, Alaska",
                      ParagraphStyle("f", fontName="Courier", fontSize=7.5, textColor=MUTED, alignment=TA_CENTER))]],
                    colWidths=[485], style=TableStyle([("LINEABOVE", (0, 0), (-1, -1), 0.8, GOLD), ("TOPPADDING", (0, 0), (-1, -1), 8)]))]
     d = Packet(os.path.join(OUT, "Dot1Media-Capability-Statement.pdf"), "CAPABILITY STATEMENT", has_cover=False)

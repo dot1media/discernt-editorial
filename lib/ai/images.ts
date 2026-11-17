@@ -54,7 +54,7 @@ export async function searchOpenverseImage(query: string, timeoutMs = 4500): Pro
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Dot1News-ContentPipeline/1.0 (+https://dot1.media)',
+        'User-Agent': 'Discernt-ContentPipeline/1.0 (+https://dot1.media)',
         Accept: 'application/json',
       },
     });

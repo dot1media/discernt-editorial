@@ -15,6 +15,40 @@ function isPrimaryMember(m: { source: FeedSource }): boolean {
   return !!m.source.sourceType && PRIMARY_SOURCE_TYPES.has(m.source.sourceType);
 }
 
+// ---- Syndication detection -------------------------------------------------
+// Several outlets running the SAME wire copy are not independent corroboration.
+// We detect it by near-identical source excerpts and tell the writer and scorer,
+// so three republications of one AP story do not read as three confirmations.
+function descTokens(s: string): Set<string> {
+  return new Set((s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w.length >= 4));
+}
+function jaccard(a: Set<string>, b: Set<string>): number {
+  if (!a.size || !b.size) return 0;
+  let inter = 0;
+  for (const t of a) if (b.has(t)) inter++;
+  return inter / (a.size + b.size - inter);
+}
+/** Groups of member indices whose source excerpts are near-identical (the same
+ *  wire copy); only groups of 2+ are returned. */
+function syndicationGroups(members: SourceMember[]): number[][] {
+  const toks = members.map((m) => descTokens(m.item.description || ''));
+  const parent = members.map((_, i) => i);
+  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])));
+  for (let i = 0; i < members.length; i++) {
+    for (let j = i + 1; j < members.length; j++) {
+      if (toks[i].size >= 6 && toks[j].size >= 6 && jaccard(toks[i], toks[j]) >= 0.7) parent[find(i)] = find(j);
+    }
+  }
+  const groups = new Map<number, number[]>();
+  for (let i = 0; i < members.length; i++) {
+    const r = find(i);
+    const g = groups.get(r) || [];
+    g.push(i);
+    groups.set(r, g);
+  }
+  return [...groups.values()].filter((g) => g.length > 1);
+}
+
 // A URL that looks like a site's default/logo/placeholder rather than this
 // article's own photo. Used to reject a generic feed or og:image so the story
 // gets a matched illustration (or the branded category fallback) instead of a
@@ -265,6 +299,10 @@ function buildWriterPrompt(members: SourceMember[]): string {
     .join('\n');
   const otherOutlets = members.slice(1).map((m) => m.source.name).join(', ');
   const hasPrimary = members.some(isPrimaryMember);
+  const synGroups = syndicationGroups(members);
+  const synNote = synGroups.length
+    ? `\nSYNDICATION ALERT: these outlets are running the SAME wire copy, so they are ONE source, not independent confirmation: ${synGroups.map((g) => g.map((i) => members[i].source.name).join(' = ')).join('; ')}. Attribute the shared text to its origin ("as [wire] reported, carried by …") and never imply independent corroboration where there is none.`
+    : '';
 
   return `You are the staff writer for "Discernt", a Christian news platform whose credibility rests on measured, verifiable reporting. You write the brief ONLY. A separate assessor will score it.
 
@@ -285,7 +323,7 @@ VOICE AND STYLE (this is what makes the writing read like a person, not a machin
 ${multi ? `SOURCE REPORTING (your ONLY factual material). ${members.length} outlets are reporting the same event:` : 'SOURCE ITEM (your ONLY factual material):'}
 ${sourceBlock}
 - Published around: ${primary.item.publishedAt ? primary.item.publishedAt.toISOString() : 'unknown'}
-- App category: ${primary.source.category}
+- App category: ${primary.source.category}${synNote}
 
 Your charter:
 
@@ -316,6 +354,8 @@ OUTPUT, ONLY a JSON object, no fences, no preamble:
 
 function buildScorerPrompt(members: SourceMember[], draft: WriterOutput): string {
   const primary = members[0];
+  const synDup = syndicationGroups(members).reduce((n, g) => n + (g.length - 1), 0);
+  const independentOutlets = Math.max(1, members.length - synDup);
   return `You are the independent D1-4LS v3.0 assessor for "Discernt". You did NOT write the brief below — assess it with discernment. Eloquence is not evidence: score the story AS SOURCED, and do not reward spectacle or unverified claims.
 
 D1-4LS v3.0 INTERPRETATION PRINCIPLES (govern your scoring AND your written interpretation):
@@ -327,7 +367,7 @@ D1-4LS v3.0 INTERPRETATION PRINCIPLES (govern your scoring AND your written inte
 
 ORIGINAL SOURCE REPORTING (${members.length} outlet${members.length > 1 ? 's' : ''} on this event):
 ${members.map((m, i) => `[${i + 1}] ${m.source.name}${isPrimaryMember(m) ? ' [PRIMARY SOURCE]' : ''}: ${m.item.title}${m.item.description ? `\n    ${m.item.description.slice(0, 300)}` : ''}`).join('\n')}
-${members.length > 1 ? 'Independent corroboration counts for Source Credibility: when several outlets report the same facts, sciVerification should reflect that; when a claim rests on only one, it should not.' : ''}
+${members.length > 1 ? `Independent corroboration counts for Source Credibility: when several outlets report the same facts, sciVerification should reflect that; when a claim rests on only one, it should not. Independent outlets here: ${independentOutlets} of ${members.length}${synDup ? ' (the remainder are the same wire copy republished, which is NOT independent confirmation)' : ''}. Base sciVerification on the independent count, not the raw outlet count.` : ''}
 ${members.some(isPrimaryMember) ? `A PRIMARY source is present (${members.filter(isPrimaryMember).map((m) => m.source.name).join(', ')}). If the brief actually draws its core facts from it and attributes them, sciPrimarySourceAccess should reflect firsthand access (toward 2); if the brief does not use the primary source, do not credit it.` : ''}
 
 THE BRIEF UNDER ASSESSMENT:

@@ -34,7 +34,20 @@ export interface FeedSource {
   category: NewsCategory;
   sciBaseline: SciBaseline;
   enabled: boolean;
+  /**
+   * Dossier source_type for members produced by this source. Registry feeds
+   * leave it unset (treated as secondary reporting); the corroboration layer
+   * sets it, marking primary documents (government_document, public_record,
+   * press_release, …) so the writer and scorer can treat them as firsthand.
+   */
+  sourceType?: string;
 }
+
+/** source_type values that count as a firsthand/primary source for scoring
+ *  sciPrimarySourceAccess. Mirrors the newsroom SOURCE_TYPES list. */
+export const PRIMARY_SOURCE_TYPES = new Set([
+  'primary', 'government_document', 'public_record', 'press_release', 'organization',
+]);
 
 export const DEFAULT_FEEDS: FeedSource[] = [
   // ── Discernt beat: reputable Christian news outlets covering God's work —

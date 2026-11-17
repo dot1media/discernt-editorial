@@ -26,7 +26,6 @@
  * from whatever outlets we already have.
  */
 
-import { parseFeedBody } from './rss';
 import type { FeedSource, SciBaseline, NewsCategory } from './sources';
 import type { SourceMember } from './generate';
 
@@ -114,6 +113,70 @@ function decodeEntities(s: string): string {
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
+function stripTags(s: string): string {
+  return decodeEntities(
+    String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, ' '),
+  ).replace(/\s+/g, ' ').trim();
+}
+
+/** A Google News RSS item, with the publisher domain and name from <source>. */
+interface GNItem {
+  title: string;
+  link: string;
+  description: string;
+  publishedAt: Date | null;
+  sourceName: string;
+  sourceUrl: string;
+}
+
+/** Parse Google News RSS, keeping the per-item <source url="…">Name</source>
+ *  so we can see each item's actual publisher domain without resolving it. */
+function parseGoogleNews(xml: string): GNItem[] {
+  const blocks = xml.match(/<item[\s>][\s\S]*?<\/item>/gi) || [];
+  const out: GNItem[] = [];
+  for (const b of blocks) {
+    const title = stripTags((b.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || '');
+    let link = ((b.match(/<link[^>]*>([\s\S]*?)<\/link>/i) || [])[1] || '').trim();
+    if (!/^https?:/i.test(link)) link = ((b.match(/<link[^>]*href="([^"]+)"/i) || [])[1] || '').trim();
+    if (!title || !/^https?:/i.test(link)) continue;
+    const description = stripTags((b.match(/<description[^>]*>([\s\S]*?)<\/description>/i) || [])[1] || '').slice(0, 1200);
+    const rawDate = (b.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i) || [])[1];
+    let publishedAt: Date | null = null;
+    if (rawDate) { const d = new Date(rawDate); if (!isNaN(d.getTime())) publishedAt = d; }
+    const sm = b.match(/<source[^>]*url="([^"]*)"[^>]*>([\s\S]*?)<\/source>/i);
+    out.push({
+      title: decodeEntities(title),
+      link: decodeEntities(link),
+      description,
+      publishedAt,
+      sourceName: sm ? stripTags(sm[2]) : '',
+      sourceUrl: sm ? decodeEntities(sm[1]) : '',
+    });
+  }
+  return out;
+}
+
+/** Classify an item as a firsthand/primary source by its publisher domain and
+ *  name, returning the dossier source_type to use, or null for ordinary
+ *  secondary reporting. Deliberately conservative: only clear primary classes
+ *  (government, courts, press-release wires, academic) qualify. */
+function primaryKind(it: GNItem): string | null {
+  const host = hostOf(it.sourceUrl || it.link).toLowerCase();
+  const name = (it.sourceName || '').toLowerCase();
+  if (/(?:^|\.)gov(?:$|\.)/.test(host) || /(?:^|\.)mil(?:$|\.)/.test(host)) {
+    return /court|judiciary|judicial/.test(host + ' ' + name) ? 'public_record' : 'government_document';
+  }
+  if (/\b(white house|department of|u\.s\.|united nations|parliament|ministry of|governor|attorney general|supreme court|european commission)\b/.test(name)) {
+    return /court|supreme court/.test(name) ? 'public_record' : 'government_document';
+  }
+  if (/prnewswire|globenewswire|businesswire|business-wire|einpresswire|presswire|accesswire|newswire/.test(host) ||
+      /\bnewswire\b|\bpress release\b|\bpresswire\b/.test(name)) {
+    return 'press_release';
+  }
+  if (/(?:^|\.)edu(?:$|\.)/.test(host)) return 'primary';
+  return null;
 }
 
 async function fetchXml(url: string, timeoutMs: number): Promise<string | null> {
@@ -244,52 +307,70 @@ export async function corroborate(
   const xml = await fetchXml(url, opts.timeoutMs ?? 9000);
   if (!xml) return [];
 
-  const items = parseFeedBody(xml);
+  const items = parseGoogleNews(xml);
   const leadTokens = tokens(lead.item.title);
   const leadWhen = lead.item.publishedAt?.getTime() ?? null;
   const taken = new Set<string>([...existingOutlets].map((n) => n.toLowerCase()));
 
-  // First pass: pick the distinct, on-event outlets (cheap, no network).
-  const picked: { headline: string; outlet: string; it: typeof items[number] }[] = [];
-  for (const it of items) {
-    if (picked.length >= want) break;
-    const { headline, outlet } = splitOutlet(it.title);
-    if (!outlet || !it.link) continue;
-    const key = outlet.toLowerCase();
-    if (taken.has(key)) continue;                       // one member per outlet, and never the lead's outlet
-
+  const onEvent = (headline: string): boolean => {
     const ct = tokens(headline);
     let inter = 0;
     for (const t of ct) if (leadTokens.has(t)) inter++;
     const union = ct.size + leadTokens.size - inter;
-    const jaccard = union ? inter / union : 0;
-    if (!(inter >= 2 || jaccard >= 0.3)) continue;      // same event only
+    return inter >= 2 || (union ? inter / union : 0) >= 0.3;
+  };
+  const recent = (it: GNItem): boolean =>
+    !(leadWhen && it.publishedAt && Math.abs(it.publishedAt.getTime() - leadWhen) > 6 * 24 * 3600 * 1000);
 
-    if (leadWhen && it.publishedAt) {
-      if (Math.abs(it.publishedAt.getTime() - leadWhen) > 6 * 24 * 3600 * 1000) continue; // recent only
+  // One pass, no network: pick up to `want` distinct secondary outlets, and up
+  // to one firsthand/primary source (government, court, wire, academic) — the
+  // single thing that most separates reporting from rewrite.
+  interface Pick { headline: string; outlet: string; it: GNItem; kind: string | null }
+  const secondary: Pick[] = [];
+  let primary: Pick | null = null;
+  for (const it of items) {
+    const { headline } = splitOutlet(it.title);
+    const outlet = it.sourceName || splitOutlet(it.title).outlet;
+    if (!outlet || !it.link) continue;
+    const key = outlet.toLowerCase();
+    if (taken.has(key)) continue;                       // one member per outlet, never the lead's
+    if (!onEvent(headline) || !recent(it)) continue;    // same event, recent
+
+    const kind = primaryKind(it);
+    if (kind) {
+      if (!primary) { primary = { headline, outlet, it, kind }; taken.add(key); }
+    } else if (secondary.length < want) {
+      secondary.push({ headline, outlet, it, kind: null });
+      taken.add(key);
     }
-    taken.add(key);
-    picked.push({ headline, outlet, it });
+    if (secondary.length >= want && primary) break;
   }
-  if (picked.length === 0) return [];
+  const picks = [...secondary, ...(primary ? [primary] : [])];
+  if (picks.length === 0) return [];
 
-  // Second pass: resolve each to the publisher's canonical URL + a real excerpt,
-  // in parallel so this adds one round-trip, not one per outlet.
+  // Resolve each to the publisher's canonical URL + a real excerpt, in parallel
+  // so this adds one round-trip, not one per outlet.
   const perMs = opts.perArticleMs ?? 5000;
-  const resolved = await Promise.allSettled(picked.map((p) => resolveArticle(p.it.link, perMs)));
+  const resolved = await Promise.allSettled(picks.map((p) => resolveArticle(p.it.link, perMs)));
 
-  return picked.map((p, i) => {
-    const r = resolved[i].status === 'fulfilled' ? (resolved[i] as PromiseFulfilledResult<{ url: string; excerpt: string }>).value : { url: p.it.link, excerpt: '' };
+  return picks.map((p, i) => {
+    const r = resolved[i].status === 'fulfilled'
+      ? (resolved[i] as PromiseFulfilledResult<{ url: string; excerpt: string }>).value
+      : { url: p.it.link, excerpt: '' };
     const link = r.url || p.it.link;
     const description = r.excerpt || p.it.description || '';
     const source: FeedSource = {
-      id: `corr-${slug(p.outlet)}`,
+      id: `${p.kind ? 'primary' : 'corr'}-${slug(p.outlet)}`,
       name: p.outlet,
       url: link,
       category: lead.source.category as NewsCategory,
       sciBaseline: baselineFor(p.outlet),
       enabled: true,
+      ...(p.kind ? { sourceType: p.kind } : null),
     };
-    return { item: { ...p.it, title: p.headline, link, description }, source };
+    return {
+      item: { title: p.headline, link, description, publishedAt: p.it.publishedAt, imageUrl: null, imageWidth: null },
+      source,
+    };
   });
 }

@@ -149,13 +149,16 @@ async function seedDossier(storyId: string, article: GeneratedArticle, members: 
   //    confirm them against the outlet's own report, not the aggregator link.
   for (const { item, source } of members) {
     const b = source.sciBaseline;
-    const viaSearch = source.id.startsWith("corr-");
-    const srcNote = viaSearch
-      ? `Corroborating coverage found via news search. Confirm against ${source.name}'s own report before relying on it: ${item.link}`
-      : `Outlet reporting this event. Original report: ${item.link}${item.description ? `. ${item.description}` : ""}`;
+    const srcType = source.sourceType || "secondary_reporting";
+    const viaSearch = source.id.startsWith("corr-") || source.id.startsWith("primary-");
+    const srcNote = source.sourceType
+      ? `Primary source (${source.sourceType.replace(/_/g, " ")}) located via news search. Read and confirm the original document before relying on it: ${item.link}`
+      : viaSearch
+        ? `Corroborating coverage found via news search. Confirm against ${source.name}'s own report before relying on it: ${item.link}`
+        : `Outlet reporting this event. Original report: ${item.link}${item.description ? `. ${item.description}` : ""}`;
     await sql`INSERT INTO story_sources (id, story_id, name, organization, title, contact, source_type, attribution, response_status, notes, reliability_notes, added_by, date_contacted)
       VALUES (${newId("src")}, ${storyId}, ${source.name}, ${source.name}, ${""}, ${""},
-        ${"secondary_reporting"}, ${"on_record"}, ${"pending"},
+        ${srcType}, ${"on_record"}, ${"pending"},
         ${clip(srcNote, 600)},
         ${`Registry SCI baseline for ${source.name}: transparency ${b.transparency}/2, track record ${b.trackRecord}/2, editorial standards ${b.editorialStandards}/2.`},
         ${"ai-desk"}, ${null})`;
@@ -172,9 +175,11 @@ async function seedDossier(storyId: string, article: GeneratedArticle, members: 
 
   // 3) A provenance entry in the reporting log.
   const corroborated = members.filter((m) => m.source.id.startsWith("corr-")).length;
+  const primaries = members.filter((m) => !!m.source.sourceType).length;
   const logEntry = clip(
     `AI Desk synthesized this draft from ${members.length} outlet${members.length > 1 ? "s" : ""} (${outletNames})` +
       (corroborated ? `, of which ${corroborated} ${corroborated > 1 ? "were" : "was"} added by active corroboration (news search)` : "") +
+      (primaries ? `; ${primaries} primary source${primaries > 1 ? "s" : ""} (official document or statement) attached for verification` : "") +
       ` via the two-pass writer and independent D1-4LS scorer. ` +
       `Score confidence: ${article.scoreConfidence}. Sources, evidence, and candidate claims are auto-seeded; verification is pending editorial review.`,
     800,

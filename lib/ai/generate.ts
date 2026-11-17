@@ -2,7 +2,18 @@ import type { FeedItem } from './rss';
 import { fetchOgImage } from './rss';
 import { searchOpenverseImage } from './images';
 import type { FeedSource } from './sources';
-import { CATEGORY_FALLBACK_IMAGES, fallbackImageFor } from './sources';
+import { CATEGORY_FALLBACK_IMAGES, fallbackImageFor, PRIMARY_SOURCE_TYPES } from './sources';
+
+/** A member is a firsthand/primary source when the corroboration layer tagged
+ *  its FeedSource with a primary source_type. */
+const PRIMARY_LABEL: Record<string, string> = {
+  primary: 'primary source', government_document: 'government document',
+  public_record: 'public record', press_release: 'press release',
+  organization: 'organization statement',
+};
+function isPrimaryMember(m: { source: FeedSource }): boolean {
+  return !!m.source.sourceType && PRIMARY_SOURCE_TYPES.has(m.source.sourceType);
+}
 import { EDITORIAL_THESIS, turningsForPrompt } from './editorialThesis';
 import {
   IndicatorScores,
@@ -229,9 +240,13 @@ function buildWriterPrompt(members: SourceMember[]): string {
   const primary = members[0];
   const multi = members.length > 1;
   const sourceBlock = members
-    .map((m, i) => `[${i + 1}] ${m.source.name}\n    Headline: ${m.item.title}\n    Summary: ${m.item.description || '(none provided)'}\n    URL: ${m.item.link}`)
+    .map((m, i) => {
+      const tag = isPrimaryMember(m) ? ` [PRIMARY SOURCE: ${PRIMARY_LABEL[m.source.sourceType!] || 'primary'}]` : '';
+      return `[${i + 1}] ${m.source.name}${tag}\n    Headline: ${m.item.title}\n    Summary: ${m.item.description || '(none provided)'}\n    URL: ${m.item.link}`;
+    })
     .join('\n');
   const otherOutlets = members.slice(1).map((m) => m.source.name).join(', ');
+  const hasPrimary = members.some(isPrimaryMember);
 
   return `You are the staff writer for "Discernt", a Christian news platform whose credibility rests on measured, verifiable reporting. You write the brief ONLY. A separate assessor will score it.
 
@@ -261,7 +276,8 @@ Your charter:
 ${multi
   ? `2. SYNTHESIS AND ATTRIBUTION: these outlets are covering the same event. Write ONE account from what they report together, grounded only in the material above. Where the outlets agree, you may report it plainly and credit them by name (for example "as ${primary.source.name}, ${otherOutlets}, and others report"). Where they differ, add a detail the others omit, or only one outlet asserts something, say which outlet and note the difference. Making the reader see how the coverage converges and diverges is the point, so include at least one such comparison when the sources allow it. Never present a claim only one outlet makes as established fact without attributing it to that outlet.`
   : `2. ATTRIBUTION: credit ${primary.source.name} within the first two paragraphs ("according to ${primary.source.name}", "the outlet reports").`}
-3. LOADED-LANGUAGE AUDIT: before finalizing, re-read your draft and strip adjectives and verbs that smuggle judgment (for example slammed, radical, so-called, shocking, extremist) unless they appear inside an attributed quote from a source. Prefer denotative verbs: said, announced, reported, ruled.
+${hasPrimary ? `2a. PRIMARY SOURCE: one or more sources above are marked PRIMARY (an official statement, filing, press release, or public record). Anchor the core facts in the primary source and attribute it plainly ("according to the ruling", "the agency said in its statement", "the organization announced"). Use the secondary outlets for reaction, context, and to show where their accounts add to or differ from the primary document. Never put a secondary outlet's characterization into the primary source's mouth.
+` : ''}3. LOADED-LANGUAGE AUDIT: before finalizing, re-read your draft and strip adjectives and verbs that smuggle judgment (for example slammed, radical, so-called, shocking, extremist) unless they appear inside an attributed quote from a source. Prefer denotative verbs: said, announced, reported, ruled.
 4. GENUINE DISPUTES: where the story involves contested positions, render the strongest honest version of each side's stated reasoning in one sentence each. This is fairness on real disputes. Do not manufacture balance on settled facts.
 5. TONAL FIREWALL: the brief above is measured reportage, with no sermonizing, no editorial adjectives, and no us-versus-them framing. Your Christian editorial voice lives ONLY in the closing section.
 
@@ -292,8 +308,9 @@ D1-4LS v3.0 INTERPRETATION PRINCIPLES (govern your scoring AND your written inte
 - Separation: keep scriptural and kingdom interpretation distinct from factual verification; distinguish a story's SUBJECT from its editorial TREATMENT.
 
 ORIGINAL SOURCE REPORTING (${members.length} outlet${members.length > 1 ? 's' : ''} on this event):
-${members.map((m, i) => `[${i + 1}] ${m.source.name}: ${m.item.title}`).join('\n')}
+${members.map((m, i) => `[${i + 1}] ${m.source.name}${isPrimaryMember(m) ? ' [PRIMARY SOURCE]' : ''}: ${m.item.title}`).join('\n')}
 ${members.length > 1 ? 'Independent corroboration counts for Source Credibility: when several outlets report the same facts, sciVerification should reflect that; when a claim rests on only one, it should not.' : ''}
+${members.some(isPrimaryMember) ? `A PRIMARY source is present (${members.filter(isPrimaryMember).map((m) => m.source.name).join(', ')}). If the brief actually draws its core facts from it and attributes them, sciPrimarySourceAccess should reflect firsthand access (toward 2); if the brief does not use the primary source, do not credit it.` : ''}
 
 THE BRIEF UNDER ASSESSMENT:
 ${draft.body}

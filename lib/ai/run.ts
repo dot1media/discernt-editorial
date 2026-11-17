@@ -4,7 +4,7 @@ import { recomputeReviewState } from "@/lib/reviewState";
 import { newId } from "@/lib/api";
 import { getFeeds, type FeedSource, type NewsCategory } from "@/lib/ai/sources";
 import { fetchFeed, type FeedItem } from "@/lib/ai/rss";
-import { generateArticle, type GeneratedArticle, type SourceMember } from "@/lib/ai/generate";
+import { generateArticle, findUnverifiedQuotes, type GeneratedArticle, type SourceMember } from "@/lib/ai/generate";
 import { youTubeToSourceItem } from "@/lib/ai/youtube";
 import { getTopicPrefs } from "@/lib/ai/topics";
 import { corroborate } from "@/lib/ai/corroborate";
@@ -228,6 +228,16 @@ async function seedDossier(storyId: string, article: GeneratedArticle, members: 
     await sql`INSERT INTO verification_claims (id, story_id, claim, status, sources, notes, updated_by)
       VALUES (${newId("clm")}, ${storyId}, ${claimText}, ${"disputed"}, ${clip(c.positions, 400)},
         ${"Flagged by the AI desk as a factual disagreement between outlets. Resolve against the original reports, then set to confirmed or false once reconciled."}, ${"ai-desk"})`;
+  }
+
+  // 4b) Direct quotes in the brief that are not grounded in the source material
+  //     the desk actually holds. Flagged for mandatory word-for-word checking
+  //     before publication (invented, or lifted from a full report we never saw
+  //     — either way, verify it).
+  for (const q of findUnverifiedQuotes(article.content, members)) {
+    await sql`INSERT INTO verification_claims (id, story_id, claim, status, sources, notes, updated_by)
+      VALUES (${newId("clm")}, ${storyId}, ${clip(`Quote to verify: "${q}"`, 300)}, ${"unconfirmed"}, ${members[0].source.name},
+        ${"This direct quotation does not appear in the source material available to the desk. Confirm it word-for-word against the original report before publishing, or remove it."}, ${"ai-desk"})`;
   }
 
   // 4) The brief's factual claims, as an unconfirmed verification checklist.

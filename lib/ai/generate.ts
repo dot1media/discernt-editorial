@@ -49,6 +49,36 @@ function syndicationGroups(members: SourceMember[]): number[][] {
   return [...groups.values()].filter((g) => g.length > 1);
 }
 
+// ---- Quote integrity -------------------------------------------------------
+// The desk writes from excerpts, not full articles, so a direct quote in the
+// brief may not be in the material we hold — whether invented or lifted from the
+// full report we never saw. Either way it must be confirmed before publication.
+// We flag any quote in the NEWS BRIEF (not the Through the Lens reflection,
+// which may cite Scripture) that is not grounded in the available source text.
+function normText(s: string): string {
+  return (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+export function findUnverifiedQuotes(body: string, members: SourceMember[]): string[] {
+  const brief = body.split(/^\s*Through the Lens\s*$/m)[0] || body;
+  const sourceText = normText(members.map((m) => `${m.item.title}. ${m.item.description || ''}`).join(' '));
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const re = /[“"]([^“”"]{15,240})[”"]/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(brief))) {
+    const q = m[1].trim();
+    if (!/\s/.test(q) || seen.has(q)) continue;   // skip single words / scare quotes / dupes
+    seen.add(q);
+    const nq = normText(q);
+    if (sourceText.includes(nq)) continue;        // exact match present
+    const qw = nq.split(' ').filter((w) => w.length >= 4);
+    const hit = qw.filter((w) => sourceText.includes(w)).length;
+    if (qw.length && hit / qw.length >= 0.7) continue; // most distinctive words present
+    out.push(q);
+  }
+  return out.slice(0, 6);
+}
+
 // A URL that looks like a site's default/logo/placeholder rather than this
 // article's own photo. Used to reject a generic feed or og:image so the story
 // gets a matched illustration (or the branded category fallback) instead of a
@@ -329,6 +359,7 @@ Your charter:
 
 0. HEADLINE DISCIPLINE: the source headlines may be sensational. Your rewritten title must be calm, clear, and substantive. Describe what actually happened, not the shock of it. Strip words engineered for a jolt (slams, shocking, chaos, bombshell, and the like). A reader should trust the headline is not manipulating them.
 1. STRUCTURE it in this order, without printing these labels: what happened (lede, one to two paragraphs), then key context or why now, then who is affected and what is at stake, then what remains disputed, unknown, or unverified. If the sources are thin, write SHORTER rather than padding. Never invent names, numbers, quotes, dates, locations, or events absent from the source material.
+1a. QUOTES: do not put quotation marks around any words unless those exact words appear in the source material above. You are working from short excerpts, not full articles, so you will usually have no quotable text; paraphrase and attribute indirectly instead ("the agency said", "according to the report"). A fabricated or loosely-remembered quotation is the most damaging error you can make.
 ${multi
   ? `2. SYNTHESIS AND ATTRIBUTION: these outlets are covering the same event. Write ONE account from what they report together, grounded only in the material above. Where the outlets agree, you may report it plainly and credit them by name (for example "as ${primary.source.name}, ${otherOutlets}, and others report"). Where they differ, add a detail the others omit, or only one outlet asserts something, say which outlet and note the difference. Making the reader see how the coverage converges and diverges is the point, so include at least one such comparison when the sources allow it. Never present a claim only one outlet makes as established fact without attributing it to that outlet.`
   : `2. ATTRIBUTION: credit ${primary.source.name} within the first two paragraphs ("according to ${primary.source.name}", "the outlet reports").`}
